@@ -1,0 +1,13 @@
+node_modules
+package-lock.json
+.env
+
+
+# Ignore all files in the img, sound, and video directories within uploads
+/uploads/img/*
+/uploads/sound/*
+/uploads/video/*
+
+# Except for the default.png file in the img directory
+!/uploads/img/default.png
+
