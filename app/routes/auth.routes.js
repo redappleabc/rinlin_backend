@@ -12,8 +12,10 @@ module.exports = app => {
 
   // Retrieve all campaigns
   router.post('/phone_register', users.phoneRegister);
-  // router.get('/getuser', auth, users.getOne);
-  // router.get('/getplan', auth, users.getUserPlan);
+  router.post('/phone_login', users.phoneLogin);
+  router.post('/save_name', auth, users.saveName);
+  
+  router.post('/refresh_token/', users.updateAccessToken);
 
   // router.get('/getall_subscription', auth, users.getAllSub);
   // router.get('/getgivelist', auth, users.getAllGiveList);

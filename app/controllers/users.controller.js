@@ -4,25 +4,53 @@ const db = require('../models')
 const crypto = require('crypto');
 const moment = require('moment-timezone');
 const { where } = require('sequelize');
+const jwt = require("jsonwebtoken");
 
 const User = db.user
 
 // Retrieve all campaigns
+exports.updateAccessToken = async (req, res) => {
+  try {
+    const refreshToken = req.body.refresh_token
+    if(refreshToken == null){
+      res.status(400).json("RefreshToken is valid.");
+    }
+    jwt.verify(token, process.env.REFRESH_SECRET, async (err, user) => {
+      if (err) return res.status(401).json({ msg: "RefreshToken is incorrectly!" });
+      const realUser = await User.findOne({
+        where:{
+          id:user.userId
+        }
+      })
+      if (realUser) {
+        const userId = realUser.id
+        const payload = { userId };
+        const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET, { expiresIn : "24h" });
+        const result = {
+          accessToken: accessToken
+        }
+        res.status(200).json(result)
+      }else{
+        res.status(401).json({ msg: "Token is incorrectly!" });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
 
 exports.phoneRegister = async (req, res) => {
   try {
-    console.log(req.body)
     const buffer = crypto.randomBytes(3); // Generates 3 random bytes
     const pin = parseInt(buffer.toString('hex'), 16) % 1000000; // Convert to a number and limit to 6 digits
     const randomString = pin.toString().padStart(6, '0');
-    console.log(randomString);
     const user = await User.findOne({
       where:{
         phoneNumber: req.body.phone_number
       }
     });
-    console.log("user", user);
-
     if(user != null){
       user.phoneverifycode=randomString;
       user.save();
@@ -38,8 +66,61 @@ exports.phoneRegister = async (req, res) => {
       message: error.message || ''
     })
   }
-  
 }
+
+exports.phoneLogin = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where:{
+        phoneNumber:req.body.phone_number
+      }
+    });
+    if(user){
+      const userId = user.id
+      if (user.phoneverifycode == req.body.verify_code) {
+        const payload = { userId };
+        const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET, { expiresIn : "24h" })
+        const refreshToken =  jwt.sign(payload, process.env.REFRESH_SECRET)
+        const result = {
+          id: userId,
+          accessToken: accessToken,
+          refreshToken: refreshToken
+        }
+        res.status(200).json(result)
+      } else {
+        res.status(400).json("VerifyCode is incorrect.");
+      }
+    }else{
+      res.status(400).json("VerifyCode is incorrect.");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.saveName = async (req, res) => {
+  try {
+    console.log("req.body", parseInt(req.body.id))
+    const userId = parseInt(req.body.id)
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.name = req.body.name;
+      user.save();
+    }
+    res.status(200).json("success");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
 // exports.isPay=async(req, res)=>{
 //   try {
 //     var email=JSON.parse(req.body.email);
