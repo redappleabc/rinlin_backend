@@ -9,7 +9,6 @@ module.exports = async function(req, res, next) {
   // Get token from header
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  console.log("token================", token)
 
   if(token == null){
     res.status(401).json({ msg: "Token is not valid" });

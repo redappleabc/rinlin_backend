@@ -102,7 +102,6 @@ exports.phoneLogin = async (req, res) => {
 
 exports.saveName = async (req, res) => {
   try {
-    console.log("req.body", parseInt(req.body.id))
     const userId = parseInt(req.body.id)
     const user = await User.findOne({
       where:{
@@ -113,7 +112,7 @@ exports.saveName = async (req, res) => {
       user.name = req.body.name;
       user.save();
     }
-    res.status(200).json("success");
+    res.status(200).json("Saved name!");
   } catch (error) {
     res.status(500).json({
       message: error.message || ''
@@ -121,6 +120,76 @@ exports.saveName = async (req, res) => {
   }
 }
 
+exports.saveAge = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id)
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.age = parseInt(req.body.age);
+      user.save();
+    }
+    res.status(200).json("Saved age!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+exports.saveFirstStep = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id)
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.gender = parseInt(req.body.gender);
+      user.prefectureId = parseInt(req.body.prefectureId);
+      user.height = parseInt(req.body.height);
+      user.bodyType = parseInt(req.body.bodyType);
+      user.attitude = parseInt(req.body.attitude)
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+exports.saveSecondStep = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id)
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.blood = parseInt(req.body.blood);
+      user.birth = parseInt(req.body.birth);
+      user.education = parseInt(req.body.education);
+      user.jobType = parseInt(req.body.jobType);
+      user.materialHistory = parseInt(req.body.materialHistory);
+      user.income = parseInt(req.body.income);
+      user.children = parseInt(req.body.children);
+      user.housework = parseInt(req.body.housework);
+      user.hopeMeet = parseInt(req.body.hopeMeet);
+      user.dateCost = parseInt(req.body.dateCost);
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
 // exports.isPay=async(req, res)=>{
 //   try {
 //     var email=JSON.parse(req.body.email);

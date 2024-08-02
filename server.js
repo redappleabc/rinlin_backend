@@ -53,10 +53,10 @@ require("./app/routes/auth.routes")(app);
 // require("./app/routes/users.routes")(app);
 // require("./app/routes/notification.routes")(app);
 // require("./app/routes/payment.routes")(app);
-
+app.use("/api/upload", require('./app/routes/upload.routes'));
 // app.use("/api/user", require('./app/routes/users'));
 // app.use("/api/auth", require('./app/routes/auth'));
-// app.use("/api/item", require('./app/routes/item'));
+// app.use("/api/upload", require('./app/routes/upload'));
 
 // set port, listen for requests
 const PORT = process.env.PORT || 5000;
