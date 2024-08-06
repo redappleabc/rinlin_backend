@@ -5,8 +5,10 @@ const crypto = require('crypto');
 const moment = require('moment-timezone');
 const { where } = require('sequelize');
 const jwt = require("jsonwebtoken");
+const { group } = require('console');
 
 const User = db.user
+const Group = db.group
 
 // Retrieve all campaigns
 exports.updateAccessToken = async (req, res) => {
@@ -57,6 +59,11 @@ exports.phoneRegister = async (req, res) => {
     }else{
       const newuser = User.create({
         phoneNumber: req.body.phone_number,
+        pointCount: 50,
+        phrase1: "こんにちは！\n共通する趣味や性格に惹かれて、メッセージを送ってみました。\n私はADREESに在住するAGE歳のNAMEです。\nメッセージお待ちしております。",
+        phrase2: "初めまして。\n私は$uniqueADREESに在住する$uniqueAGE歳の$uniqueNAMEです。\nお互いまずはゆっくりとメッセージを重ねて仲良くなりたいです。\nよろしくお願いいたします。",
+        phrase3: "初めまして。$NAMEと申します。\nプロフィールを拝見して、ぜひ一度メッセージをしたいと思いご連絡いたしました。\nよろしくお願いいたします。",
+        verifyed: false,
         phoneverifycode: randomString
       });
     }
@@ -162,6 +169,7 @@ exports.saveFirstStep = async (req, res) => {
     })
   }
 }
+
 exports.saveSecondStep = async (req, res) => {
   try {
     const userId = parseInt(req.body.id)
@@ -179,11 +187,105 @@ exports.saveSecondStep = async (req, res) => {
       user.income = parseInt(req.body.income);
       user.children = parseInt(req.body.children);
       user.housework = parseInt(req.body.housework);
-      user.hopeMeet = parseInt(req.body.hopeMeet);
-      user.dateCost = parseInt(req.body.dateCost);
+      user.hopemeet = parseInt(req.body.hopeMeet);
+      user.datecost = parseInt(req.body.dateCost);
       user.save();
     }
     res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.saveIntroduce = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id)
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.introduce = req.body.introduce;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.getUser = async (req, res) => {
+  try {
+    console.log("req.query", req.query)
+    const userId= req.query.userId;
+    const user = await User.findOne({
+      where:{
+        id: userId
+      },
+      include: Group
+    });
+    if (user) {
+      let avatars = [];
+      if (user.avatar1 != null) {
+        avatars.push(user.avatar1)
+      }
+      if (user.avatar2 != null) {
+        avatars.push(user.avatar2)
+      }
+      if (user.avatar3 != null) {
+        avatars.push(user.avatar3)
+      }
+      if (user.avatar4 != null) {
+        avatars.push(user.avatar4)
+      }
+      let groups = [];
+      for (let i = 0; i < user.groups.length; i++) {
+        groups[i]=user.groups[i].id
+      }
+
+      const result = {
+        id: user.id,
+        name: user.name,
+        age: user.age,
+        gender: user.gender,
+        prefectureId: user.prefectureId,
+        height: user.height,
+        bodyType: user.bodyType,
+        attitude: user.attitude,
+        avatars: avatars,
+        blood: user.blood,
+        birth: user.birth,
+        education: user.education,
+        jobType: user.jobType,
+        income: user.income,
+        materialHistory: user.materialHistory,
+        children: user.children,
+        housework: user.housework,
+        hopeMeet: user.hopemeet,
+        dateCost: user.datecost,
+        holiday: user.holiday,
+        roomate: user.roomate,
+        alcohol: user.alcohol,
+        smoking: user.smoking,
+        saving: user.saving,
+        favoriteImage: user.favoriteImage,
+        favoriteDescription: user.favoriteDescription,
+        groups:groups,
+        isVerify:user.verifyed,
+        pointCount: user.pointCount,
+        questions: [user.question1, user.question2, user.question3],
+        phrases: [user.phrase1, user.phrase2, user.phrase3],
+        deadline: user.deadline,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+      res.status(200).json(result);
+    }
   } catch (error) {
     res.status(500).json({
       message: error.message || ''

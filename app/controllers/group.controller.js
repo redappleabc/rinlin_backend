@@ -1,0 +1,188 @@
+const axios = require('axios')
+const { format } = require('date-fns')
+const db = require('../models')
+const { where } = require('sequelize')
+const { json } = require('body-parser')
+const Group = db.group
+const User = db.user
+const Category = db.category
+const Op = db.Sequelize.Op
+const Sequelize = db.Sequelize
+
+// Retrieve all campaigns
+exports.getAllGroup = async (req, res) => {
+  try {
+    const groups = await Group.findAll({
+      order: [['id', 'ASC']]
+    })
+    if (groups) {
+      let result = [];
+      for (let i = 0; i < groups.length; i++) {
+        result[i] = {
+          id : groups[i].id,
+          name : groups[i].name,
+          image : groups[i].image,
+          members : groups[i].members,
+          categoryId : groups[i].categoryId
+        }
+      }
+      res.status(200).json(result)
+    } else {
+      res.status(400).json("An error occurred while obtaining group information.")
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: err.message || 'An error occurred while obtaining group information.',
+    })
+  }
+}
+
+exports.getAllCategories = async (req, res) => {
+  try {
+    const categories = await Category.findAll({
+      order: [['order', 'ASC']]
+    })
+    if (categories) {
+      let result = [];
+      for (let i = 0; i < categories.length; i++) {
+        result[i] = {
+          id : categories[i].id,
+          name : categories[i].name,
+          image : categories[i].order
+        }
+      }
+      res.status(200).json(result)
+    } else {
+      res.status(400).json("An error occurred while obtaining category information.")
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: err.message || 'An error occurred while obtaining category information.',
+    })
+  }
+}
+exports.saveGroups=async(req, res)=>{
+  try {
+    const len=JSON.parse( req.body.groups).length;
+    const user = await User.findOne({
+      where:{
+        id : req.body.id
+      }
+    });
+    const groupArray = []
+    for (let i = 0; i < len; i++) {
+      groupArray[i] = await Group.findOne({
+        where: {
+          id: JSON.parse(req.body.groups)[i]
+        }
+      });
+      console.log("group", groupArray[i])
+      await user.addGroup(groupArray[i], {through: { selfGranted: false }});
+    }
+    res.status(200).json("success")
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || 'An error occurred while archiving group information.',
+    })
+  }
+
+  //  const resultReason=[];
+  //  const user=await User.findOne({
+  //           where: {
+  //               email: req.body.email
+  //             },
+  //             order: [['email', 'DESC']],
+  //           });
+  //   for(let i=0;i<len;i++){
+  //     resultReason[i]=await Reason.findOne({
+  //       where: {
+  //         id: JSON.parse( req.body.reasons)[i]
+  //       },
+  //       order: [['id', 'DESC']],
+  //     });
+  //     // console.log(result[i]);
+  //     await user.addReason(resultReason[i], {through: { selfGranted: false }});
+  //   }
+  //   const resultIntroduction=[];
+  //   for(let i=0;i<len1;i++){
+  //     resultIntroduction[i]=await Introduction.findOne({
+  //           where: {
+  //               id: JSON.parse( req.body.introductions)[i]
+  //             },
+  //             order: [['id', 'DESC']],
+  //           });
+  //     // console.log(result[i]);
+  //     await user.addIntroduction(resultIntroduction[i], {through: { selfGranted: false }});
+  //   }
+}
+
+// exports.getOneReason = async (req, res) => {
+//   // console.log(req.query);
+//   const reason = await Reason.findOne({
+//     where: {
+//       id: req.query.id
+//     },
+//   })
+//     .then((data) => {
+//       // console.log("111====", data);
+//       res.json(data)
+//     })
+//     .catch((err) => {
+//       res.status(500).json({
+//         message: err.message || 'Some error occurred while retrieving campaigns',
+//       })
+//     })
+// }
+
+// exports.updateReason = async (req, res) => {
+//   // console.log("111", req.body); 
+//   try {
+//     const reason = await Reason.findOne({
+//       where: {
+//         id: req.body.id
+//       },
+//     });
+//     reason.text=req.body.textReason;
+//     reason.en_text=req.body.entextReason;
+//     reason.save();  
+//     return res.status(200).json("Success")
+//   } catch (error) {
+//     res.status(500).json({
+//       message: error.message || ''
+//     })
+//   }
+// }
+
+// exports.addReason = async (req, res) => {
+//   console.log(req.body);
+//   try {
+//     const reason = await Reason.create({
+//       text: req.body.textReason,
+//       en_text: req.body.entextReason,
+//     });
+//     return res.status(200).json("success")
+//   } catch (error) {
+//     res.status(500).json({
+//       message: error.message || ''
+//     })
+//   }
+// }
+
+// exports.deleteOneItem = async (req, res) => {
+//   // console.log("111", req.query.id);
+//   try {
+//     const reason = await Reason.findOne({
+//       where: {
+//         id: req.query.id
+//       },
+//       order:[['id','DESC']],
+//     });
+//     reason.destroy();
+
+//     return res.status(200).json("Success")
+//   } catch (error) {
+//     res.status(500).json({
+//       message: error.message || ''
+//     })
+//   }
+// }

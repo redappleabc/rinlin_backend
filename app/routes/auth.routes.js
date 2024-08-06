@@ -11,16 +11,17 @@ module.exports = app => {
   var router = require("express").Router();
 
   // Retrieve all campaigns
+  router.post('/refresh_token/', users.updateAccessToken);
+
   router.post('/phone_register', users.phoneRegister);
   router.post('/phone_login', users.phoneLogin);
   router.post('/save_name', auth, users.saveName);
   router.post('/save_age', auth, users.saveAge);
   router.post('/save_firststep', auth, users.saveFirstStep);
   router.post('/save_secondstep', auth, users.saveSecondStep);
+  router.post('/save_introduce', auth, users.saveIntroduce);
   
-  router.post('/refresh_token/', users.updateAccessToken);
-
-  // router.get('/getall_subscription', auth, users.getAllSub);
+  router.get('/getuser', auth, users.getUser);
   // router.get('/getgivelist', auth, users.getAllGiveList);
 
   // router.get('/getone_reason', auth, users.getOneReason);

@@ -47,7 +47,7 @@ app.get("/", (req, res) => {
 });
 
 require("./app/routes/auth.routes")(app);
-// require("./app/routes/reason.routes")(app);
+require("./app/routes/group.routes")(app);
 // require("./app/routes/introduction.routes")(app);
 // require("./app/routes/item.routes")(app);
 // require("./app/routes/users.routes")(app);
