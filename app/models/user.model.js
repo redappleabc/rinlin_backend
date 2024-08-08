@@ -114,6 +114,9 @@ module.exports = (sequelize, Sequelize) => {
     verifyed:{
       type:Sequelize.BOOLEAN
     },
+    paied:{
+      type:Sequelize.BOOLEAN
+    },
     pointCount: {
       type: Sequelize.INTEGER
     },

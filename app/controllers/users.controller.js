@@ -64,6 +64,7 @@ exports.phoneRegister = async (req, res) => {
         phrase2: "初めまして。\n私は$uniqueADREESに在住する$uniqueAGE歳の$uniqueNAMEです。\nお互いまずはゆっくりとメッセージを重ねて仲良くなりたいです。\nよろしくお願いいたします。",
         phrase3: "初めまして。$NAMEと申します。\nプロフィールを拝見して、ぜひ一度メッセージをしたいと思いご連絡いたしました。\nよろしくお願いいたします。",
         verifyed: false,
+        paied: false,
         phoneverifycode: randomString
       });
     }
@@ -233,15 +234,23 @@ exports.getUser = async (req, res) => {
       let avatars = [];
       if (user.avatar1 != null) {
         avatars.push(user.avatar1)
+      } else{
+        avatars.push("")
       }
       if (user.avatar2 != null) {
         avatars.push(user.avatar2)
+      } else{
+        avatars.push("")
       }
       if (user.avatar3 != null) {
         avatars.push(user.avatar3)
+      } else{
+        avatars.push("")
       }
       if (user.avatar4 != null) {
         avatars.push(user.avatar4)
+      } else{
+        avatars.push("")
       }
       let groups = [];
       for (let i = 0; i < user.groups.length; i++) {
@@ -253,6 +262,7 @@ exports.getUser = async (req, res) => {
         name: user.name,
         age: user.age,
         gender: user.gender,
+        introduce: user.introduce,
         prefectureId: user.prefectureId,
         height: user.height,
         bodyType: user.bodyType,
@@ -277,6 +287,7 @@ exports.getUser = async (req, res) => {
         favoriteDescription: user.favoriteDescription,
         groups:groups,
         isVerify:user.verifyed,
+        isPay:user.paied,
         pointCount: user.pointCount,
         questions: [user.question1, user.question2, user.question3],
         phrases: [user.phrase1, user.phrase2, user.phrase3],
@@ -286,6 +297,481 @@ exports.getUser = async (req, res) => {
       }
       res.status(200).json(result);
     }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.saveAnswer = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const index = parseInt(req.body.index);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if(index == 1){
+        if (user.question1 == null) {
+          user.pointCount = user.pointCount + 5;
+        }
+        user.question1 = req.body.answer;
+      }
+      if (index == 2) {
+        if (user.question2 == null) {
+          user.pointCount = user.pointCount + 5;
+        }
+        user.question2 = req.body.answer;
+      }
+      if (index == 3) {
+        if (user.question3 == null) {
+          user.pointCount = user.pointCount + 5;
+        }
+        user.question3 = req.body.answer;
+      }
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.saveFavoriteDescription = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if (user.favoriteDescription == null) {
+        user.pointCount = user.pointCount + 100;
+      }
+      user.favoriteDescription = req.body.description;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updatePrefectureId = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const prefectureId = parseInt(req.body.prefectureId);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.prefectureId = prefectureId;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateHeight = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const height = parseInt(req.body.height);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.height = height;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateBodyType = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const bodyType = parseInt(req.body.bodyType);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.bodyType = bodyType;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateBlood = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const blood = parseInt(req.body.blood);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.blood = blood;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateBirth = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const birth = parseInt(req.body.birth);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.birth = birth;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateEducation = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const education = parseInt(req.body.education);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.education = education;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateJobType = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const jobType = parseInt(req.body.jobType);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.jobType = jobType;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateIncome = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const income = parseInt(req.body.income);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.income = income;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateMaterialHistory = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const materialHistory = parseInt(req.body.materialHistory);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.materialHistory = materialHistory;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateAttitude = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const attitude = parseInt(req.body.attitude);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.attitude = attitude;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateChildren = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const children = parseInt(req.body.children);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.children = children;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateHousework = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const housework = parseInt(req.body.housework);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.housework = housework;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateHopeMeet = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const hopeMeet = parseInt(req.body.hopeMeet);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.hopemeet = hopeMeet;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateDateCost = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const dateCost = parseInt(req.body.dateCost);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.datecost = dateCost;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateHoliday = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const holiday = parseInt(req.body.holiday);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if(user.holiday == null){
+        user.pointCount = user.pointCount + 10;
+      }
+      user.holiday = holiday;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateRoomate = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const roomate = parseInt(req.body.roomate);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if(user.roomate == null){
+        user.pointCount = user.pointCount + 10;
+      }
+      user.roomate = roomate;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateAlcohol = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const alcohol = parseInt(req.body.alcohol);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if(user.alcohol == null){
+        user.pointCount = user.pointCount + 10;
+      }
+      user.alcohol = alcohol;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateSmoking = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const smoking = parseInt(req.body.smoking);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if(user.smoking == null){
+        user.pointCount = user.pointCount + 10;
+      }
+      user.smoking = smoking;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updateSaving = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const saving = parseInt(req.body.saving);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if(user.saving == null){
+        user.pointCount = user.pointCount + 10;
+      }
+      user.saving = saving;
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
   } catch (error) {
     res.status(500).json({
       message: error.message || ''

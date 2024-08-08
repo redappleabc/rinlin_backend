@@ -20,6 +20,27 @@ module.exports = app => {
   router.post('/save_firststep', auth, users.saveFirstStep);
   router.post('/save_secondstep', auth, users.saveSecondStep);
   router.post('/save_introduce', auth, users.saveIntroduce);
+  router.post('/save_answer', auth, users.saveAnswer);
+  router.post('/favorite_description', auth, users.saveFavoriteDescription);
+  router.post('/update_prefectureId', auth, users.updatePrefectureId);
+  router.post('/update_height', auth, users.updateHeight);
+  router.post('/update_bodyType', auth, users.updateBodyType);
+  router.post('/update_blood', auth, users.updateBlood);
+  router.post('/update_birth', auth, users.updateBirth);
+  router.post('/update_education', auth, users.updateEducation);
+  router.post('/update_jobType', auth, users.updateJobType);
+  router.post('/update_income', auth, users.updateIncome);
+  router.post('/update_materialHistory', auth, users.updateMaterialHistory);
+  router.post('/update_attitude', auth, users.updateAttitude);
+  router.post('/update_children', auth, users.updateChildren);
+  router.post('/update_housework', auth, users.updateHousework);
+  router.post('/update_hopeMeet', auth, users.updateHopeMeet);
+  router.post('/update_dateCost', auth, users.updateDateCost);
+  router.post('/update_holiday', auth, users.updateHoliday);
+  router.post('/update_roomate', auth, users.updateRoomate);
+  router.post('/update_alcohol', auth, users.updateAlcohol);
+  router.post('/update_smoking', auth, users.updateSmoking);
+  router.post('/update_saving', auth, users.updateSaving);
   
   router.get('/getuser', auth, users.getUser);
   // router.get('/getgivelist', auth, users.getAllGiveList);
