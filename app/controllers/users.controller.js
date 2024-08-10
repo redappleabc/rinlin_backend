@@ -6,6 +6,7 @@ const moment = require('moment-timezone');
 const { where } = require('sequelize');
 const jwt = require("jsonwebtoken");
 const { group } = require('console');
+const { json } = require('body-parser');
 
 const User = db.user
 const Group = db.group
@@ -91,6 +92,7 @@ exports.phoneLogin = async (req, res) => {
         const refreshToken =  jwt.sign(payload, process.env.REFRESH_SECRET)
         const result = {
           id: userId,
+          gender: user.gender,
           accessToken: accessToken,
           refreshToken: refreshToken
         }
@@ -222,7 +224,89 @@ exports.saveIntroduce = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
-    console.log("req.query", req.query)
+    const userId= req.query.userId;
+    const user = await User.findOne({
+      where:{
+        id: userId
+      },
+      include: Group
+    });
+    if (user) {
+      let avatars = [];
+      if (user.avatar1 != null) {
+        avatars.push(user.avatar1)
+      } else{
+        avatars.push("")
+      }
+      if (user.avatar2 != null) {
+        avatars.push(user.avatar2)
+      } else{
+        avatars.push("")
+      }
+      if (user.avatar3 != null) {
+        avatars.push(user.avatar3)
+      } else{
+        avatars.push("")
+      }
+      if (user.avatar4 != null) {
+        avatars.push(user.avatar4)
+      } else{
+        avatars.push("")
+      }
+      let groups = [];
+      for (let i = 0; i < user.groups.length; i++) {
+        groups[i]=user.groups[i].id
+      }
+
+      const result = {
+        id: user.id,
+        name: user.name,
+        age: user.age,
+        gender: user.gender,
+        introduce: user.introduce,
+        prefectureId: user.prefectureId,
+        height: user.height,
+        bodyType: user.bodyType,
+        attitude: user.attitude,
+        avatars: avatars,
+        blood: user.blood,
+        birth: user.birth,
+        education: user.education,
+        jobType: user.jobType,
+        income: user.income,
+        materialHistory: user.materialHistory,
+        children: user.children,
+        housework: user.housework,
+        hopeMeet: user.hopemeet,
+        dateCost: user.datecost,
+        holiday: user.holiday,
+        roomate: user.roomate,
+        alcohol: user.alcohol,
+        smoking: user.smoking,
+        saving: user.saving,
+        favoriteImage: user.favoriteImage,
+        favoriteDescription: user.favoriteDescription,
+        groups:groups,
+        isVerify:user.verifyed,
+        isPay:user.paied,
+        pointCount: user.pointCount,
+        questions: [user.question1, user.question2, user.question3],
+        phrases: [user.phrase1, user.phrase2, user.phrase3],
+        deadline: user.deadline,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+      res.status(200).json(result);
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.getUserById = async (req, res) => {
+  try {
     const userId= req.query.userId;
     const user = await User.findOne({
       where:{
@@ -772,6 +856,33 @@ exports.updateSaving = async (req, res) => {
       user.save();
     }
     res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.removeGroups = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const removeGroups = JSON.parse(req.body.removeGroups)
+    const user = await User.findOne({
+      where:{
+        id: userId
+      },
+      include: Group
+    });
+    if (user) {
+      for (let i = 0; i < removeGroups.length; i++) {
+        for (let j = 0; j < user.groups.length; j++) {
+          if (user.groups[j].id == removeGroups[i]) {
+            user.groups[j].destroy()
+          }
+        }
+      }
+    }
+    res.status(200).json("Successfully deleted!");
   } catch (error) {
     res.status(500).json({
       message: error.message || ''

@@ -48,6 +48,9 @@ app.get("/", (req, res) => {
 
 require("./app/routes/auth.routes")(app);
 require("./app/routes/group.routes")(app);
+require("./app/routes/records.routes")(app);
+require("./app/routes/like.routes")(app);
+require("./app/routes/post.routes")(app);
 // require("./app/routes/introduction.routes")(app);
 // require("./app/routes/item.routes")(app);
 // require("./app/routes/users.routes")(app);

@@ -10,6 +10,7 @@ const db = require('../models');
 const auth = require("../middleware/auth");
 const { where } = require("sequelize");
 const User = db.user;
+const Post = db.post;
 // --------main avatar---------------
 const storageMainAvatar = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -46,7 +47,18 @@ const storageFavoriteImage = multer.diskStorage({
   }
 });
 const uploadFavoriteImage = multer({ storage: storageFavoriteImage }).single("file");
-
+// ------------postImage------------------------------
+const storagePostImage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = './uploads/img/';
+    // Ensure the uploads directory exists
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now().toString().slice(0,11)+file.originalname}`);
+  }
+});
+const uploadPostImage = multer({ storage: storagePostImage }).single("file");
 // -----------------------------------------------------------
 
 router.post('/add_mainavatar', auth, uploadMainAvatar, async (req, res) => {
@@ -165,6 +177,27 @@ router.post('/favorite_image', auth, uploadFavoriteImage, async (req, res) => {
       user.favoriteImage = filename;
       user.save();
     }
+    res.status(200).json("Successfully saved!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+});
+
+router.post('/create_post', auth, uploadPostImage, async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  const userId = parseInt(req.body.userId);
+  const description = req.body.description;
+  const filename = req.file.filename;
+  try {
+    Post.create({
+      image: filename,
+      description: description,
+      userId : userId
+    });
     res.status(200).json("Successfully saved!");
   } catch (error) {
     res.status(500).json({

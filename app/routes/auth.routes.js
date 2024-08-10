@@ -43,7 +43,8 @@ module.exports = app => {
   router.post('/update_saving', auth, users.updateSaving);
   
   router.get('/getuser', auth, users.getUser);
-  // router.get('/getgivelist', auth, users.getAllGiveList);
+  router.get('/getuserById', auth, users.getUserById);
+  router.delete('/remove_groups', auth, users.removeGroups);
 
   // router.get('/getone_reason', auth, users.getOneReason);
   // router.get('/getone_introduction', auth, users.getOneIntroduction);
