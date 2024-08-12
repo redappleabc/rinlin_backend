@@ -1,4 +1,5 @@
 const auth = require("../middleware/auth.js");
+const { post } = require("./upload.routes.js");
 
 module.exports = app => {
   const posts = require("../controllers/post.controller.js");
@@ -7,9 +8,11 @@ module.exports = app => {
 
   // Retrieve all campaigns
 
-  router.get('/get_mypost', posts.getMyPost);
-  router.get('/get_posts', posts.getPosts);
-  // router.post('/updateintroduction', introductions.updateIntroduction);
+  router.get('/get_mypost', auth, posts.getMyPost);
+  router.get('/get_posts', auth, posts.getPosts);
+  router.post('/send_postmessage', auth, posts.sendPostMessage);
+  router.get('/get_postmessagelist', auth, posts.getPostMessageList);
+
   
   // router.post('/add', introductions.addIntroduction);
   // router.delete('/delete', introductions.deleteOneItem);  

@@ -380,6 +380,8 @@ exports.getUserById = async (req, res) => {
         updatedAt: user.updatedAt
       }
       res.status(200).json(result);
+    }else{
+      res.status(400).json("No User");
     }
   } catch (error) {
     res.status(500).json({
