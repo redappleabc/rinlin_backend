@@ -56,12 +56,13 @@ exports.getMyPost = async (req, res) => {
 exports.getPosts = async (req, res) => {
   try {
     const userId =  parseInt(req.query.userId);
+    console.log(userId);
+    
     const myself = await User.findOne({
       where:{
         id:userId
       }
     });
-
     const posts = await Post.findAll({
       include: Message
     });
@@ -82,7 +83,7 @@ exports.getPosts = async (req, res) => {
               }
             }
             if(!flag) {
-              result[i] = {
+              result.push({
                 id: posts[i].id,
                 userId: posts[i].userId,
                 name: user.name,
@@ -92,7 +93,7 @@ exports.getPosts = async (req, res) => {
                 avatar: user.avatar1,
                 backImage: posts[i].image,
                 messageCount: posts[i].messages.length
-              }
+              });
             }
           }
         }

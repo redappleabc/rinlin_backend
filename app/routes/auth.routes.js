@@ -46,6 +46,8 @@ module.exports = app => {
   router.get('/getuserById', auth, users.getUserById);
   router.delete('/remove_groups', auth, users.removeGroups);
 
+  router.get('/get_allusers', auth, users.getAllUsers);
+
   // router.get('/getone_reason', auth, users.getOneReason);
   // router.get('/getone_introduction', auth, users.getOneIntroduction);
   // router.get('/getstatus', auth, users.getStatus);

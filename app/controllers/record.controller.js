@@ -59,13 +59,13 @@ exports.getRecord = async (req, res) => {
         }
       })
       if (!like) {
-        result[i] = {
+        result.push({
           id:user.id,
           avatar : user.avatar1,
           name: user.name,
           age: user.age,
           prefectureId: user.prefectureId
-        }
+        });
       }
     }
     res.status(200).json(result)

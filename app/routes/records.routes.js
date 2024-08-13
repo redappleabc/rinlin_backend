@@ -7,7 +7,7 @@ module.exports = app => {
 
   // Retrieve all campaigns
 
-  router.get('/get_record', records.getRecord);
+  router.get('/get_record', auth, records.getRecord);
   router.post('/save_record', records.saveRecord);
   // router.post('/updateintroduction', introductions.updateIntroduction);
   
