@@ -868,33 +868,6 @@ exports.updateSaving = async (req, res) => {
   }
 }
 
-exports.removeGroups = async (req, res) => {
-  try {
-    const userId = parseInt(req.body.id);
-    const removeGroups = JSON.parse(req.body.removeGroups)
-    const user = await User.findOne({
-      where:{
-        id: userId
-      },
-      include: Group
-    });
-    if (user) {
-      for (let i = 0; i < removeGroups.length; i++) {
-        for (let j = 0; j < user.groups.length; j++) {
-          if (user.groups[j].id == removeGroups[i]) {
-            user.groups[j].destroy()
-          }
-        }
-      }
-    }
-    res.status(200).json("Successfully deleted!");
-  } catch (error) {
-    res.status(500).json({
-      message: error.message || ''
-    })
-  }
-}
-
 exports.getAllUsers = async (req, res) => {
   try {
     const userId= req.query.userId;
@@ -994,6 +967,128 @@ exports.getAllUsers = async (req, res) => {
           return 0;  // maintain relative order of other elements
         }
       });
+      res.status(200).json(result);
+    } else {
+      res.status(400).json("No Users");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.searchSwipeusers = async (req, res) => {
+  try {
+    const userId= parseInt(req.body.userId);
+    const minAge= parseInt(req.body.minAge);
+    const maxAge= parseInt(req.body.maxAge);
+    const minHeight= parseInt(req.body.minHeight);
+    const maxHeight= parseInt(req.body.maxHeight);
+    const prefectureIds = JSON.parse(req.body.prefectureIds);
+    const bodyTypes = JSON.parse(req.body.bodyTypes);
+    const maritalHistories = JSON.parse(req.body.maritalHistories);
+    const attitues = JSON.parse(req.body.attitues);
+    const myself = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    const users = await User.findAll({});
+    const likes = await Like.findAll({
+      where:{
+        userId: userId
+      }
+    });
+    const blocks = await Block.findAll({
+      where:{
+        userId: userId
+      }
+    });
+    const matchings = await Matching.findAll({});
+    const checkLike = (userId) =>{
+      if (likes) {
+        for (let i = 0; i < likes.length; i++) {
+          if (likes[i].received_id == userId) {
+            return false;
+          }
+        }
+        return true;
+      }else{
+        return true;
+      }
+    }
+    const checkBlock = (userId) =>{
+      if (blocks) {
+        for (let i = 0; i < blocks.length; i++) {
+          if (blocks[i].blockedUserId == userId) {
+            return false;
+          }
+        }
+        return true;
+      }else{
+        return true;
+      }
+    }
+    const checkMatching = (userId) =>{
+      if (matchings) {
+        for (let i = 0; i < matchings.length; i++) {
+          if (matchings[i].maleId == myself.id && matchings[i].femaleId == userId || matchings[i].femaleId == myself.id && matchings[i].maleId == userId) {
+            return false;
+          }
+        }
+        return true;
+      }else{
+        return true;
+      }
+    }
+    let result = [];
+    let filteredUsers = [];
+    for (let i = 0; i < users.length; i++) {
+      if (users[i] != userId && users[i].gender != myself.gender && checkLike(users[i].id) && checkBlock(users[i].id) && checkMatching(users[i].id)) {
+        filteredUsers.push(users[i]);
+      }
+    }
+    if (filteredUsers.length != 0) {
+      for (let i = 0; i < filteredUsers.length; i++) {
+        let avatars = [];
+        if (filteredUsers[i].avatar1 != null) {
+          avatars.push(filteredUsers[i].avatar1)
+        } 
+        if (filteredUsers[i].avatar2 != null) {
+          avatars.push(filteredUsers[i].avatar2)
+        } 
+        if (filteredUsers[i].avatar3 != null) {
+          avatars.push(filteredUsers[i].avatar3)
+        } 
+        if (filteredUsers[i].avatar4 != null) {
+          avatars.push(filteredUsers[i].avatar4)
+        } 
+        result[i] = {
+          id: filteredUsers[i].id,
+          name: filteredUsers[i].name,
+          description: null,
+          prefectureId: filteredUsers[i].prefectureId,
+          age: filteredUsers[i].age,
+          avatars: avatars,
+          verify: filteredUsers[i].verifyed,
+          favouriteText: filteredUsers[i].favoriteDescription,
+          favouriteImage: filteredUsers[i].favoriteImage,
+          bodyType: filteredUsers[i].bodyType,
+          materialHistory: filteredUsers[i].materialHistory,
+          attitude: filteredUsers[i].attitude
+        }
+      }
+      result.sort((a, b) => {
+        if (a.prefectureId === myself.prefectureId && b.prefectureId !== myself.prefectureId || a.verify && !b.verify) {
+          return -1; // a comes first
+        } else if (a.prefectureId !== myself.prefectureId && b.prefectureId === myself.prefectureId || !a.verify && b.verify) {
+          return 1;  // b comes first
+        } else {
+          return 0;  // maintain relative order of other elements
+        }
+      });
+      result = result.filter((item)=>(item.age >= minAge && item.age <= maxAge || item.height >= minHeight && item.height <= maxHeight || prefectureIds.includes(item.prefectureId) || bodyTypes.includes(item.bodyType) || maritalHistories.includes(item.materialHistory) || attitues.includes(item.attitude)))
       res.status(200).json(result);
     } else {
       res.status(400).json("No Users");

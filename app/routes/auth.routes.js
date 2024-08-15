@@ -41,10 +41,11 @@ module.exports = app => {
   router.post('/update_alcohol', auth, users.updateAlcohol);
   router.post('/update_smoking', auth, users.updateSmoking);
   router.post('/update_saving', auth, users.updateSaving);
+  router.post('/search_swipeusers', auth, users.searchSwipeusers);
+
   
   router.get('/getuser', auth, users.getUser);
   router.get('/getuserById', auth, users.getUserById);
-  router.delete('/remove_groups', auth, users.removeGroups);
 
   router.get('/get_allusers', auth, users.getAllUsers);
 

@@ -30,6 +30,8 @@ db.verify = require('./verify.model.js')(sequelize, Sequelize);
 db.planbuyhistory = require('./planbuyhistory.model.js')(sequelize, Sequelize);
 db.pointbuyhistory = require('./pointbuyhistory.model.js')(sequelize, Sequelize);
 db.notification = require('./notification.model.js')(sequelize, Sequelize);
+db.topgroup = require('./topgroup.model.js')(sequelize, Sequelize);
+db.topgrouptitle = require('./topgrouptitle.model.js')(sequelize, Sequelize);
 
 //associations
 db.user.belongsToMany(db.group, { through: 'user_group' });
@@ -49,6 +51,8 @@ db.user.hasMany(db.record);
 
 db.user.hasMany(db.planbuyhistory);
 db.user.hasMany(db.pointbuyhistory);
+
+db.group.hasMany(db.topgroup);
 
 // db.user.belongsToMany(db.introduction, { through: 'user_introduction' });
 // db.introduction.belongsToMany(db.user, { through: 'user_introduction' });
