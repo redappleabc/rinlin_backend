@@ -42,10 +42,17 @@ module.exports = app => {
   router.post('/update_smoking', auth, users.updateSmoking);
   router.post('/update_saving', auth, users.updateSaving);
   router.post('/search_swipeusers', auth, users.searchSwipeusers);
+  router.post('/update_phrase', auth, users.updatePhrase);
+  router.post('/advice_request', auth, users.adviceRequest);
+  router.post('/checked_verifystate', auth, users.checkedVerifystate);
 
   
   router.get('/getuser', auth, users.getUser);
   router.get('/getuserById', auth, users.getUserById);
+  router.get('/get_matchedusers', auth, users.getMatchedUsers);
+  router.get('/get_phrase', auth, users.getPhrase);
+  router.get('/get_advicestate', auth, users.getAdviceState);
+  router.get('/get_verifystate', auth, users.getVerifyState);
 
   router.get('/get_allusers', auth, users.getAllUsers);
 

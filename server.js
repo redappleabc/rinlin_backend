@@ -4,6 +4,10 @@ const { Configuration, OpenAIApi } = require("openai");
 const bodyParser = require('body-parser')
 const cors = require("cors");
 const app = express();
+const server = require('http').createServer(app);
+const socketio = require("socket.io")
+const io = socketio(server)
+
 require('dotenv').config();
 
 var corsOptions = {
@@ -50,19 +54,24 @@ require("./app/routes/auth.routes")(app);
 require("./app/routes/group.routes")(app);
 require("./app/routes/records.routes")(app);
 require("./app/routes/like.routes")(app);
+require("./app/routes/block.routes")(app);
 require("./app/routes/post.routes")(app);
-// require("./app/routes/introduction.routes")(app);
-// require("./app/routes/item.routes")(app);
-// require("./app/routes/users.routes")(app);
-// require("./app/routes/notification.routes")(app);
-// require("./app/routes/payment.routes")(app);
+require("./app/routes/notification.routes")(app);
 app.use("/api/upload", require('./app/routes/upload.routes'));
-// app.use("/api/user", require('./app/routes/users'));
-// app.use("/api/auth", require('./app/routes/auth'));
-// app.use("/api/upload", require('./app/routes/upload'));
+
+io.on('connection', (socket) => {
+  console.log(socket.id, "on Connected---------------------------------------");
+  socket.emit("messageFromServer", {data: "Connected to Server"});
+  
+  socket.on('messageFromClient', (data) => {
+    console.log("data is", data);
+    io.emit("messageFromServer", {data: data.data});
+  });
+});
 
 // set port, listen for requests
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });

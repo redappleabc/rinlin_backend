@@ -200,13 +200,15 @@ exports.createMatching = async (req, res) => {
       if (user.gender == 1) {
         Matching.create({
           maleId: userId,
-          femaleId: matchedUserId
+          femaleId: matchedUserId,
+          ischatting: false
         });
       }
       if (user.gender == 2) {
         Matching.create({
           maleId: matchedUserId,
-          femaleId: userId
+          femaleId: userId,
+          ischatting: false
         });
       }
       const like1 = await Like.findOne({

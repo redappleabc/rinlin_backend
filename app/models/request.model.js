@@ -3,6 +3,9 @@ module.exports = (sequelize, Sequelize) => {
     userId: {
       type: Sequelize.INTEGER,
     },
+    partnerId: {
+      type: Sequelize.INTEGER,
+    },
     state: {
       type: Sequelize.STRING,
     },

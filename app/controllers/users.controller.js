@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const moment = require('moment-timezone');
 const { where } = require('sequelize');
 const jwt = require("jsonwebtoken");
-const { group, log } = require('console');
+const { group, log, time } = require('console');
 const { json } = require('body-parser');
 
 const User = db.user
@@ -13,6 +13,8 @@ const Group = db.group
 const Like = db.like
 const Block = db.block
 const Matching = db.matching
+const Request = db.request
+const Verify = db.verify
 
 // Retrieve all campaigns
 exports.updateAccessToken = async (req, res) => {
@@ -1093,6 +1095,239 @@ exports.searchSwipeusers = async (req, res) => {
     } else {
       res.status(400).json("No Users");
     }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.getMatchedUsers = async (req, res) => {
+  try {
+    const userId= req.query.userId;
+    const user = await User.findOne({
+      where:{
+        id:userId
+      }
+    });
+    if (user.gender == 1) {
+      const matching = await Matching.findAll({
+        where:{
+          maleId: userId,
+          ischatting: false
+        }
+      })
+      console.log(matching);
+      
+      let result = [];
+      for (let i = 0; i < matching.length; i++) {
+        const female = await User.findOne({
+          where:{
+            id: matching[i].femaleId
+          }
+        });
+        result[i] = {
+          id: female.id,
+          name: female.name,
+          age: female.age,
+          prefectureId: female.prefectureId,
+          avatar: female.avatar1,
+          time: (matching[i].createdAt).toString() 
+        }
+        if (result.length != 0) {
+          res.status(200).json(result);
+        } else {
+          res.status(400).json("No Users");
+        }
+      }
+    } else {
+      const matching = await Matching.findAll({
+        where:{
+          femaleId: userId,
+          ischatting: false
+        }
+      })
+      let result = [];
+      for (let i = 0; i < matching.length; i++) {
+        const male = await User.findOne({
+          where:{
+            id: matching[i].maleId
+          }
+        });
+        result[i] = {
+          id: male.id,
+          name: male.name,
+          age: male.age,
+          prefectureId: male.prefectureId,
+          avatar: male.avatar1,
+          time: (matching[i].createdAt).toString() 
+        }
+        if (result.length != 0) {
+          res.status(200).json(result);
+        } else {
+          res.status(400).json("No Users");
+        }
+      }
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.getPhrase = async (req, res) => {
+  try {
+    const userId= req.query.userId;
+    const user = await User.findOne({
+      where:{
+        id:userId
+      }
+    });
+    if (user) {
+      const result = [
+        {
+          id: 1,
+          text: user.phrase1
+        },
+        {
+          id: 2,
+          text: user.phrase2
+        },
+        {
+          id: 3,
+          text: user.phrase3
+        }
+      ];
+      res.status(200).json(result);
+    } else {
+      res.status(400).json("No Users");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.updatePhrase = async (req, res) => {
+  try {
+    const userId= parseInt(req.body.userId);
+    const id= parseInt(req.body.id);
+    const user = await User.findOne({
+      where:{
+        id:userId
+      }
+    });
+    if (user) {
+      if (id == 1) {
+        user.phrase1 = req.body.text;
+      }
+      if (id == 2) {
+        user.phrase2 = req.body.text;
+      }
+      if (id == 3) {
+        user.phrase3 = req.body.text;
+      }
+      user.save();
+      res.status(200).json("success!");
+    } else {
+      res.status(400).json("No Users");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.adviceRequest = async (req, res) => {
+  try {
+    const userId= parseInt(req.body.userId);
+    const partnerId= parseInt(req.body.partnerId);
+    const request = await Request.findOne({
+      where:{
+        userId: userId,
+        partnerId: partnerId
+      }
+    });
+    if (!request) {
+      Request.create({
+        userId: userId,
+        partnerId: partnerId,
+        state: "request"
+      });
+      res.status(200).json("success!")
+    } else {
+      res.status(400).json("No Users");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.getAdviceState = async (req, res) => {
+  try {
+    const userId= req.query.userId;
+    const partnerId = req.query.partnerId
+    const request = await Request.findOne({
+      where:{
+        userId: userId,
+        partnerId: partnerId
+      }
+    });
+    if (request) {
+      res.status(200).json({
+        state: request.state,
+        answer: request.answer
+      });
+    } else {
+      res.state(400).json("No request");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.getVerifyState = async (req, res) => {
+  try {
+    const userId= req.query.userId;
+    const verify = await Verify.findOne({
+      where:{
+        userId: userId
+      }
+    });
+    if (verify && verify.showAlert) {
+      res.status(200).json({
+        state: verify.state,
+      });
+    } else {
+      res.state(400).json("No Verify");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.checkedVerifystate = async (req, res) => {
+  try {
+    const userId= parseInt(req.body.userId);
+    const verify = await Verify.findOne({
+      where:{
+        userId: userId
+      }
+    });
+    if (verify) {
+      verify.showAlert = false;
+      verify.save();  
+    }
+    res.status(200).json("Checked!");
   } catch (error) {
     res.status(500).json({
       message: error.message || ''

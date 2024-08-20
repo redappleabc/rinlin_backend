@@ -5,6 +5,9 @@ module.exports = (sequelize, Sequelize) => {
     },
     femaleId:{
       type: Sequelize.INTEGER,
+    },
+    ischatting:{
+      type: Sequelize.BOOLEAN
     }
   });
   
