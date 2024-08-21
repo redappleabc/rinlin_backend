@@ -1110,6 +1110,23 @@ exports.getMatchedUsers = async (req, res) => {
         id:userId
       }
     });
+    const blocks = await Block.findAll({
+      where:{
+        userId: userId
+      }
+    });
+    const checkBlock = (userId) =>{
+      if (blocks) {
+        for (let i = 0; i < blocks.length; i++) {
+          if (blocks[i].blockedUserId == userId) {
+            return false;
+          }
+        }
+        return true;
+      }else{
+        return true;
+      }
+    }
     if (user.gender == 1) {
       const matching = await Matching.findAll({
         where:{
@@ -1117,7 +1134,6 @@ exports.getMatchedUsers = async (req, res) => {
           ischatting: false
         }
       })
-      console.log(matching);
       
       let result = [];
       for (let i = 0; i < matching.length; i++) {
@@ -1126,19 +1142,33 @@ exports.getMatchedUsers = async (req, res) => {
             id: matching[i].femaleId
           }
         });
-        result[i] = {
-          id: female.id,
-          name: female.name,
-          age: female.age,
-          prefectureId: female.prefectureId,
-          avatar: female.avatar1,
-          time: (matching[i].createdAt).toString() 
+        if(checkBlock(female.id)){
+          const date = new Date(matching[i].createdAt);
+
+          const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+          const day = String(date.getUTCDate()).padStart(2, '0');
+
+          // Extract hours and minutes
+          const hours = String(date.getUTCHours()).padStart(2, '0');
+          const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+          // Format the date and time as "MM/DD HH:mm"
+          const formattedDate = `${month}/${day} ${hours}:${minutes}`;
+          log(formattedDate)
+          result.push({
+            id: female.id,
+            name: female.name,
+            age: female.age,
+            prefectureId: female.prefectureId,
+            avatar: female.avatar1,
+            time: formattedDate 
+          });
         }
-        if (result.length != 0) {
-          res.status(200).json(result);
-        } else {
-          res.status(400).json("No Users");
-        }
+      }
+      if (result.length != 0) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json("No Users");
       }
     } else {
       const matching = await Matching.findAll({
@@ -1154,19 +1184,21 @@ exports.getMatchedUsers = async (req, res) => {
             id: matching[i].maleId
           }
         });
-        result[i] = {
-          id: male.id,
-          name: male.name,
-          age: male.age,
-          prefectureId: male.prefectureId,
-          avatar: male.avatar1,
-          time: (matching[i].createdAt).toString() 
+        if(checkBlock(male.id)){
+          result[i] = {
+            id: male.id,
+            name: male.name,
+            age: male.age,
+            prefectureId: male.prefectureId,
+            avatar: male.avatar1,
+            time: (matching[i].createdAt).toString() 
+          }
         }
-        if (result.length != 0) {
-          res.status(200).json(result);
-        } else {
-          res.status(400).json("No Users");
-        }
+      }
+      if (result.length != 0) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json("No Users");
       }
     }
   } catch (error) {

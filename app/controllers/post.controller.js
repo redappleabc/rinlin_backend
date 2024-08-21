@@ -9,6 +9,8 @@ const Post = db.post
 const User = db.user
 const Like = db.like
 const Message = db.message
+const Block = db.block
+const Matching = db.matching
 const Op = db.Sequelize.Op
 const Sequelize = db.Sequelize
 

@@ -3,25 +3,23 @@ const path = require("path");
 const { Configuration, OpenAIApi } = require("openai");
 const bodyParser = require('body-parser')
 const cors = require("cors");
-const app = express();
-const server = require('http').createServer(app);
-const socketio = require("socket.io")
-const io = socketio(server)
-
 require('dotenv').config();
-
-var corsOptions = {
-  // origin: "http://localhost" 
-};
-
-
-app.use(cors(corsOptions));
-
+const app = express();
 // parse requests of content-type - application/json
 app.use(express.json());
-
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
+
+const server = require('http').createServer(app);
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
+// const io = socketio(server);
+// var corsOptions = {
+//   // origin: "http://localhost" 
+// };
+
+
+// app.use(cors(corsOptions));
 
 const db = require("./app/models");
 
@@ -50,6 +48,32 @@ app.get("/", (req, res) => {
   res.json({message: `Server running on port ${PORT}`})
 });
 
+var webSockets = {};
+wss.on('connection', (ws, req) => {
+  console.log('Client connected');
+  var userId = req.url.substr(1);
+  webSockets[userId] = ws;
+  
+  // Listen for messages from the client
+  ws.on('message', (message) => {
+    var messageData = JSON.parse(message)
+    console.log('Received:', messageData.userId);
+    var boardws = webSockets[messageData.userId];
+    if (boardws) {
+      boardws.send(JSON.stringify(messageData))
+    }
+  });
+
+  // Handle client disconnection
+  ws.on('close', () => {
+    var userId = req.url.substr(1);
+    delete webSockets[userId]; 
+    console.log("User Disconnected: " + userId);
+  });
+});
+
+console.log('WebSocket server is running on ws://localhost:8080');
+
 require("./app/routes/auth.routes")(app);
 require("./app/routes/group.routes")(app);
 require("./app/routes/records.routes")(app);
@@ -58,16 +82,6 @@ require("./app/routes/block.routes")(app);
 require("./app/routes/post.routes")(app);
 require("./app/routes/notification.routes")(app);
 app.use("/api/upload", require('./app/routes/upload.routes'));
-
-io.on('connection', (socket) => {
-  console.log(socket.id, "on Connected---------------------------------------");
-  socket.emit("messageFromServer", {data: "Connected to Server"});
-  
-  socket.on('messageFromClient', (data) => {
-    console.log("data is", data);
-    io.emit("messageFromServer", {data: data.data});
-  });
-});
 
 // set port, listen for requests
 const PORT = process.env.PORT || 5000;
