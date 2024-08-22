@@ -32,6 +32,7 @@ db.pointbuyhistory = require('./pointbuyhistory.model.js')(sequelize, Sequelize)
 db.notification = require('./notification.model.js')(sequelize, Sequelize);
 db.topgroup = require('./topgroup.model.js')(sequelize, Sequelize);
 db.topgrouptitle = require('./topgrouptitle.model.js')(sequelize, Sequelize);
+db.report = require('./report.model.js')(sequelize, Sequelize);
 
 //associations
 db.user.belongsToMany(db.group, { through: 'user_group' });

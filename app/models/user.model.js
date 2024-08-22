@@ -144,6 +144,9 @@ module.exports = (sequelize, Sequelize) => {
     deadline:{
       type:Sequelize.DATE
     },
+    experience:{
+      type:Sequelize.BOOLEAN
+    },
   }
 );
 

@@ -7,6 +7,7 @@ const { where } = require('sequelize');
 const jwt = require("jsonwebtoken");
 const { group, log, time } = require('console');
 const { json } = require('body-parser');
+const twilio = require('twilio');
 
 const User = db.user
 const Group = db.group
@@ -33,7 +34,7 @@ exports.updateAccessToken = async (req, res) => {
       if (realUser) {
         const userId = realUser.id
         const payload = { userId };
-        const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET, { expiresIn : "24h" });
+        const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET);
         const result = {
           accessToken: accessToken
         }
@@ -71,9 +72,23 @@ exports.phoneRegister = async (req, res) => {
         phrase3: "初めまして。$NAMEと申します。\nプロフィールを拝見して、ぜひ一度メッセージをしたいと思いご連絡いたしました。\nよろしくお願いいたします。",
         verifyed: false,
         paied: false,
-        phoneverifycode: randomString
+        phoneverifycode: randomString,
+        experience: true
       });
     }
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const client = new twilio(accountSid, authToken);
+    const phoneNumber = `+${req.body.phone_number}`;
+    client.messages.create({
+      body: `Your verification code is: ${randomString}`,
+      to: phoneNumber,
+      from: process.env.TWILIO_PHONE_NUMBER
+    })
+    .then((message) => {
+      console.log(`Message sent: ${message.sid}`)
+    })
+    .catch((error) => console.error(`Error sending message: ${error.message}`));
     res.status(200).json("success");
   } catch (error) {
     res.status(500).json({
@@ -298,6 +313,7 @@ exports.getUser = async (req, res) => {
         questions: [user.question1, user.question2, user.question3],
         phrases: [user.phrase1, user.phrase2, user.phrase3],
         deadline: user.deadline,
+        experience: user.experience,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       }
@@ -381,6 +397,7 @@ exports.getUserById = async (req, res) => {
         questions: [user.question1, user.question2, user.question3],
         phrases: [user.phrase1, user.phrase2, user.phrase3],
         deadline: user.deadline,
+        experience: user.experience,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       }
@@ -1103,7 +1120,7 @@ exports.searchSwipeusers = async (req, res) => {
 }
 
 exports.getMatchedUsers = async (req, res) => {
-  try {
+  try {    
     const userId= req.query.userId;
     const user = await User.findOne({
       where:{
@@ -1112,9 +1129,10 @@ exports.getMatchedUsers = async (req, res) => {
     });
     const blocks = await Block.findAll({
       where:{
-        userId: userId
+        userId:userId
       }
     });
+    
     const checkBlock = (userId) =>{
       if (blocks) {
         for (let i = 0; i < blocks.length; i++) {
@@ -1360,6 +1378,27 @@ exports.checkedVerifystate = async (req, res) => {
       verify.save();  
     }
     res.status(200).json("Checked!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.deleteAccount = async (req, res) => {
+  try {
+    const userId= parseInt(req.body.userId);
+    const user = await User.findOne({
+      where:{
+        userId: userId
+      }
+    });
+    if (user) {
+      user.destroy();  
+    } else {
+      res.status(400).json("No User!");
+    }
+    res.status(200).json("Deleted!");
   } catch (error) {
     res.status(500).json({
       message: error.message || ''
