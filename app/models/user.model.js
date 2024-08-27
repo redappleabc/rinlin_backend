@@ -120,7 +120,7 @@ module.exports = (sequelize, Sequelize) => {
     pointCount: {
       type: Sequelize.INTEGER
     },
-    matchedUsers: {
+    viewUsers: {
       type: Sequelize.INTEGER
     },
     question1:{

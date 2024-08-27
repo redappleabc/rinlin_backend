@@ -108,7 +108,7 @@ exports.phoneLogin = async (req, res) => {
       const userId = user.id
       if (user.phoneverifycode == req.body.verify_code) {
         const payload = { userId };
-        const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET, { expiresIn : "24h" })
+        const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET)
         const refreshToken =  jwt.sign(payload, process.env.REFRESH_SECRET)
         const result = {
           id: userId,
@@ -314,6 +314,7 @@ exports.getUser = async (req, res) => {
         phrases: [user.phrase1, user.phrase2, user.phrase3],
         deadline: user.deadline,
         experience: user.experience,
+        viewUsers: user.viewUsers,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       }
@@ -398,6 +399,7 @@ exports.getUserById = async (req, res) => {
         phrases: [user.phrase1, user.phrase2, user.phrase3],
         deadline: user.deadline,
         experience: user.experience,
+        viewUsers: user.viewUsers,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       }
@@ -1378,6 +1380,26 @@ exports.checkedVerifystate = async (req, res) => {
       verify.save();  
     }
     res.status(200).json("Checked!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.clearViewUsers = async (req, res) => {
+  try {
+    const userId= parseInt(req.body.userId);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.viewUsers = 0;
+      user.save();
+    }
+    res.status(200).json("success!");
   } catch (error) {
     res.status(500).json({
       message: error.message || ''

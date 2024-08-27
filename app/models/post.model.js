@@ -6,6 +6,9 @@ module.exports = (sequelize, Sequelize) => {
     description: {
       type: Sequelize.TEXT,
     },
+    newMessageCount: {
+      type: Sequelize.INTEGER
+    }
   });
 
   return Post;

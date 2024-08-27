@@ -41,7 +41,8 @@ exports.getMyPost = async (req, res) => {
           age: user.age,
           avatar: user.avatar1,
           backImage: posts[i].image,
-          messageCount: posts[i].messages.length
+          messageCount: posts[i].messages.length,
+          newMessageCount: posts[i].newMessageCount
         }
       }
       res.status(200).json(result)
@@ -94,7 +95,8 @@ exports.getPosts = async (req, res) => {
                 age: user.age,
                 avatar: user.avatar1,
                 backImage: posts[i].image,
-                messageCount: posts[i].messages.length
+                messageCount: posts[i].messages.length,
+                newMessageCount: posts[i].newMessageCount
               });
             }
           }
@@ -133,6 +135,12 @@ exports.sendPostMessage = async (req, res) => {
       content: content
     });
     await post.addMessage(message, {through: { selfGranted: false }});  
+    if(post.newMessageCount){
+      post.newMessageCount = post.newMessageCount + 1;
+    }else{
+      post.newMessageCount = 1;
+    }
+    post.save();
     res.status(200).json("success!")
   } catch (error) {
     res.status(500).json({
@@ -178,6 +186,26 @@ exports.getPostMessageList = async (req, res) => {
     }else{
       res.status(400).json("The post doesn't exist.")
     }
+  } catch (error) {
+    res.status(500).json({
+      message: err.message || 'An error occurred while obtaining records.',
+    })
+  }
+}
+
+exports.clearNewMessageCount = async (req, res) => {
+  try {
+    const postId =  parseInt(req.body.postId);
+    const post = await Post.findOne({
+      where:{
+        id: postId
+      }
+    });
+    if (post) {
+      post.newMessageCount = 0;
+      post.save();
+    }
+    res.status(200).json("success!")
   } catch (error) {
     res.status(500).json({
       message: err.message || 'An error occurred while obtaining records.',

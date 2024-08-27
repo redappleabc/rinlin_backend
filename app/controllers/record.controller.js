@@ -14,19 +14,30 @@ exports.saveRecord = async (req, res) => {
   try {
     const userId =  parseInt(req.body.userId);
     const visiterId = parseInt(req.body.visiterId);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
     if (userId != visiterId) {
       const record = await Record.findOne({
         where:{
           userId : userId,
           visiterId : visiterId
         },
-        order: [['id', 'ASC']]
+        order: [['id', 'DESC']]
       });
       if (!record) {
         Record.create({
           visiterId: visiterId,
           userId: userId,
         });
+        if (user.viewUsers) {
+          user.viewUsers = user.viewUsers + 1;
+        } else {
+          user.viewUsers = 1;
+        }
+        user.save();
       }
     }
     res.status(200).json("success!")
@@ -44,7 +55,7 @@ exports.getRecord = async (req, res) => {
       where:{
         userId : userId
       },
-      order: [['id', 'ASC']]
+      order: [['id', 'DESC']]
     });
     let result = [];
     for (let i = 0; i < records.length; i++) {

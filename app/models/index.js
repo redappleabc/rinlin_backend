@@ -38,6 +38,9 @@ db.report = require('./report.model.js')(sequelize, Sequelize);
 db.user.belongsToMany(db.group, { through: 'user_group' });
 db.group.belongsToMany(db.user, { through: 'user_group' });
 
+db.user.belongsToMany(db.notification, { through: 'user_notification' });
+db.notification.belongsToMany(db.user, { through: 'user_notification' });
+
 db.group.belongsTo(db.category);
 
 db.user.hasMany(db.like);

@@ -12,7 +12,7 @@ module.exports = app => {
   router.get('/get_posts', auth, posts.getPosts);
   router.post('/send_postmessage', auth, posts.sendPostMessage);
   router.get('/get_postmessagelist', auth, posts.getPostMessageList);
-
+  router.post('/clear_newmessagecount', auth, posts.clearNewMessageCount);
   
   // router.post('/add', introductions.addIntroduction);
   // router.delete('/delete', introductions.deleteOneItem);  

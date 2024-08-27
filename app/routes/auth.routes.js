@@ -45,6 +45,7 @@ module.exports = app => {
   router.post('/update_phrase', auth, users.updatePhrase);
   router.post('/advice_request', auth, users.adviceRequest);
   router.post('/checked_verifystate', auth, users.checkedVerifystate);
+  router.post('/clear_viewusers', auth, users.clearViewUsers);
   router.delete('/delete_account', auth, users.deleteAccount);
   
   router.get('/getuser', auth, users.getUser);

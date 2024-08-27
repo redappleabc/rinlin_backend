@@ -9,7 +9,7 @@ module.exports = app => {
   // Retrieve all campaigns
   router.get('/get_notifications', auth, notification.getNotifications);
   // router.get('/getonenotification', auth, notification.getOneNotification);
-  // router.post('/addnotification', auth, notification.addNotification);
+  router.post('/adduser', auth, notification.addUserToNotification);
 
   // // router.get('/sendnotification', notification.sendNotification);
   
