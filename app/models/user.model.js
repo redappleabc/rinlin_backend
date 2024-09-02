@@ -18,6 +18,12 @@ module.exports = (sequelize, Sequelize) => {
     facebookPassword: {
       type: Sequelize.STRING,
     },
+    googleDisplayName: {
+      type: Sequelize.STRING,
+    },
+    email: {
+      type: Sequelize.STRING,
+    },
     phoneNumber:{
       type: Sequelize.STRING,
     },

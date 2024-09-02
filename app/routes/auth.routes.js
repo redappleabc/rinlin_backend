@@ -15,6 +15,7 @@ module.exports = app => {
 
   router.post('/phone_register', users.phoneRegister);
   router.post('/phone_login', users.phoneLogin);
+  router.post('/google_login', users.googleLogin);
   router.post('/save_name', auth, users.saveName);
   router.post('/save_age', auth, users.saveAge);
   router.post('/save_firststep', auth, users.saveFirstStep);

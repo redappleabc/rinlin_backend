@@ -73,7 +73,8 @@ exports.phoneRegister = async (req, res) => {
         verifyed: false,
         paied: false,
         phoneverifycode: randomString,
-        experience: true
+        experience: true,
+        viewUsers:0
       });
     }
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -126,6 +127,60 @@ exports.phoneLogin = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: error.message || ''
+    })
+  }
+}
+
+exports.googleLogin = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where:{
+        googleDisplayName:req.body.displayName,
+        email:req.body.email
+      }
+    });
+    if(user){
+      const userId = user.id;
+      const payload = { userId };
+      const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET)
+      const refreshToken =  jwt.sign(payload, process.env.REFRESH_SECRET)
+      const result = {
+        id: userId,
+        gender: user.gender,
+        accessToken: accessToken,
+        refreshToken: refreshToken
+      }
+      res.status(200).json(result);
+    } else {
+      const newuser = await User.create({
+        googleDisplayName: req.body.displayName,
+        email: req.body.email,
+        pointCount: 50,
+        phrase1: "こんにちは！\n共通する趣味や性格に惹かれて、メッセージを送ってみました。\n私はADREESに在住するAGE歳のNAMEです。\nメッセージお待ちしております。",
+        phrase2: "初めまして。\n私は$uniqueADREESに在住する$uniqueAGE歳の$uniqueNAMEです。\nお互いまずはゆっくりとメッセージを重ねて仲良くなりたいです。\nよろしくお願いいたします。",
+        phrase3: "初めまして。$NAMEと申します。\nプロフィールを拝見して、ぜひ一度メッセージをしたいと思いご連絡いたしました。\nよろしくお願いいたします。",
+        verifyed: false,
+        paied: false,
+        experience: true,
+        viewUsers:0
+      });
+      const userId = newuser.id
+      console.log("userId", userId);
+      
+      const payload = { userId };
+      const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET)
+      const refreshToken =  jwt.sign(payload, process.env.REFRESH_SECRET)
+      const result = {
+        id: userId,
+        gender: newuser.gender,
+        accessToken: accessToken,
+        refreshToken: refreshToken
+      }
+      res.status(200).json(result);
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || 'Failed in Login'
     })
   }
 }
