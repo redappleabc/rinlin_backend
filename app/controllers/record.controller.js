@@ -3,6 +3,7 @@ const { format } = require('date-fns')
 const db = require('../models')
 const { where } = require('sequelize')
 const { json } = require('body-parser')
+const { ONE_SIGNAL_CONFIG }=require("../config/app.config");
 const Record = db.record
 const User = db.user
 const Like = db.like
@@ -38,6 +39,33 @@ exports.saveRecord = async (req, res) => {
           user.viewUsers = 1;
         }
         user.save();
+        if (user) {
+          const notificationData = {
+            app_id: ONE_SIGNAL_CONFIG.APP_ID,           // Your OneSignal App ID
+            include_aliases:{
+              onesignal_id: [
+                user.onesignalId,
+              ]
+            },       // The Player IDs (specific devices)
+            target_channel:"push",
+            headings: { en: "リンリン" },             // Notification title
+            contents: { en: `足跡がつきました！確認してみよう！` },           // Notification message
+            data: {
+              screen: "record",
+            },                // Optional additional data (useful for handling clicks or app events)
+          };
+          try {
+            const response = await axios.post('https://onesignal.com/api/v1/notifications', notificationData, {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${ONE_SIGNAL_CONFIG.API_KEY}`,  // Use your REST API key here
+              },
+            });
+            console.log('Notification sent successfully:', response.data);
+          } catch (error) {
+            console.error('Error sending notification:', error.response ? error.response.data : error.message);
+          }
+        }
       }
     }
     res.status(200).json("success!")

@@ -16,15 +16,19 @@ module.exports = async function(req, res, next) {
 
   jwt.verify(token, process.env.ACCESS_SECRET, async (err, user) => {
     if (err) return res.status(401).json({ msg: "Token is incorrectly!" });
-    const realUser = await User.findOne({
-      where:{
-        id:user.userId
-      }
-    })
-    if (realUser) {
+    if (user.id == 'admin') {
       next();
-    }else{
-      res.status(401).json({ msg: "Token is incorrectly!" });
+    } else {
+      const realUser = await User.findOne({
+        where:{
+          id:user.userId
+        }
+      })
+      if (realUser) {
+        next();
+      }else{
+        res.status(401).json({ msg: "Token is incorrectly!" });
+      }
     }
   });
 

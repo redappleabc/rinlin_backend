@@ -10,7 +10,7 @@ module.exports = app => {
   router.get('/get_notifications', auth, notification.getNotifications);
   // router.get('/getonenotification', auth, notification.getOneNotification);
   router.post('/adduser', auth, notification.addUserToNotification);
-
+  router.post('/admin/push_notification', auth, notification.sendNotificationToSpecificDevices);
   // // router.get('/sendnotification', notification.sendNotification);
   
   // router.post('/updatenotification', auth, notification.updateNotification);

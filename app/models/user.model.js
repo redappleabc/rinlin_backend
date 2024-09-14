@@ -30,6 +30,9 @@ module.exports = (sequelize, Sequelize) => {
     phoneverifycode: {
       type: Sequelize.STRING
     },
+    onesignalId: {
+      type: Sequelize.STRING
+    },
     name: {
       type: Sequelize.STRING,
     },

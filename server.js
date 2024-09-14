@@ -14,12 +14,12 @@ const server = require('http').createServer(app);
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 8080 });
 // const io = socketio(server);
-// var corsOptions = {
-//   // origin: "http://localhost" 
-// };
+var corsOptions = {
+  origin: "*" 
+};
 
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 const db = require("./app/models");
 

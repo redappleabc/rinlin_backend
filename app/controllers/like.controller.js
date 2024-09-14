@@ -4,6 +4,7 @@ const db = require('../models')
 const { where } = require('sequelize')
 const { json } = require('body-parser')
 const { verify } = require('crypto')
+const { ONE_SIGNAL_CONFIG }=require("../config/app.config");
 const Matching = db.matching
 const User = db.user
 const Like = db.like
@@ -34,6 +35,39 @@ exports.sendLike = async (req, res) => {
         received_id: receivedId
       });
       user.pointCount = user.pointCount - 1;
+      user.save();
+      const receivedUser = await User.findOne({
+        where:{
+          id: receivedId
+        }
+      });
+      if (receivedUser) {
+        const notificationData = {
+          app_id: ONE_SIGNAL_CONFIG.APP_ID,           // Your OneSignal App ID
+          include_aliases:{
+            onesignal_id: [
+              receivedUser.onesignalId,
+            ]
+          },       // The Player IDs (specific devices)
+          target_channel:"push",
+          headings: { en: "リンリン" },             // Notification title
+          contents: { en: `いいねをされました！` },           // Notification message
+          data: {
+            screen: "like",
+          },                // Optional additional data (useful for handling clicks or app events)
+        };
+        try {
+          const response = await axios.post('https://onesignal.com/api/v1/notifications', notificationData, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Basic ${ONE_SIGNAL_CONFIG.API_KEY}`,  // Use your REST API key here
+            },
+          });
+          console.log('Notification sent successfully:', response.data);
+        } catch (error) {
+          console.error('Error sending notification:', error.response ? error.response.data : error.message);
+        }
+      }
     }
     res.status(200).json("success!")
   } catch (error) {
@@ -88,6 +122,39 @@ exports.sendMessageLike = async (req, res) => {
         message: message
       });
       user.pointCount = user.pointCount -1;
+      user.save();
+      const receivedUser = await User.findOne({
+        where:{
+          id: receivedId
+        }
+      });
+      if (receivedUser) {
+        const notificationData = {
+          app_id: ONE_SIGNAL_CONFIG.APP_ID,           // Your OneSignal App ID
+          include_aliases:{
+            onesignal_id: [
+              receivedUser.onesignalId,
+            ]
+          },       // The Player IDs (specific devices)
+          target_channel:"push",
+          headings: { en: "リンリン" },             // Notification title
+          contents: { en: `いいねをされました！` },           // Notification message
+          data: {
+            screen: "like",
+          },                // Optional additional data (useful for handling clicks or app events)
+        };
+        try {
+          const response = await axios.post('https://onesignal.com/api/v1/notifications', notificationData, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Basic ${ONE_SIGNAL_CONFIG.API_KEY}`,  // Use your REST API key here
+            },
+          });
+          console.log('Notification sent successfully:', response.data);
+        } catch (error) {
+          console.error('Error sending notification:', error.response ? error.response.data : error.message);
+        }
+      }
     }
     res.status(200).json("success!")
   } catch (error) {
@@ -260,6 +327,43 @@ exports.createMatching = async (req, res) => {
         }
       }
       user.pointCount = user.pointCount - 1;
+      user.save();
+      const user1 = await User.findOne({
+        where:{
+          id: userId
+        }
+      });
+      const user2 = await User.findOne({
+        where:{
+          id: matchedUserId
+        }
+      });
+      const notificationData = {
+        app_id: ONE_SIGNAL_CONFIG.APP_ID,           // Your OneSignal App ID
+        include_aliases:{
+          onesignal_id: [
+            user1.onesignalId,
+            user2.onesignalId
+          ]
+        },       // The Player IDs (specific devices)
+        target_channel:"push",
+        headings: { en: "リンリン" },             // Notification title
+        contents: { en: `マッチングが成立しました。\n${user1.name}さんと${user2.name}さんとのマッチングが成立しました。` },           // Notification message
+        data: {
+          screen: "matching",
+        },                // Optional additional data (useful for handling clicks or app events)
+      };
+      try {
+        const response = await axios.post('https://onesignal.com/api/v1/notifications', notificationData, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${ONE_SIGNAL_CONFIG.API_KEY}`,  // Use your REST API key here
+          },
+        });
+        console.log('Notification sent successfully:', response.data);
+      } catch (error) {
+        console.error('Error sending notification:', error.response ? error.response.data : error.message);
+      }
       res.status(200).json("success!");
     } else {
       res.status(400).json("No User!");

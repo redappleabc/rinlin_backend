@@ -17,6 +17,63 @@ const Matching = db.matching
 const Request = db.request
 const Verify = db.verify
 
+// Admin
+exports.adminLogin = async (req, res) => {
+  try {
+    if (req.body.adminName == process.env.ADMIN_NAME && req.body.password == process.env.ADMIN_PASSWORD) {
+      const payload = {
+        id: 'admin'
+      };
+      const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET)
+      res.status(200).json(accessToken)
+    }else{
+      res.status(400).json("Admin Name or Password is uncorrect");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.adminGetAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      order: [['id', 'ASC']]  
+    });
+    
+    if (users) {
+      res.status(200).json(users);
+    } else {
+      res.status(400).json("No Users");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.adminGetOneUsers = async (req, res) => {
+  try {
+    const userId = req.query.userId
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(400).json("No User");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
 // Retrieve all campaigns
 exports.updateAccessToken = async (req, res) => {
   try {
@@ -165,7 +222,6 @@ exports.googleLogin = async (req, res) => {
         viewUsers:0
       });
       const userId = newuser.id
-      console.log("userId", userId);
       
       const payload = { userId };
       const accessToken =  jwt.sign(payload, process.env.ACCESS_SECRET)
@@ -181,6 +237,28 @@ exports.googleLogin = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: error.message || 'Failed in Login'
+    })
+  }
+}
+
+exports.saveOnesignalId = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id)
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    console.log("req.body.onesignalId", req.body.onesignalId);
+    if (user) {
+      user.onesignalId = (req.body.onesignalId).toString();
+      user.save();
+    }
+    console.log(user);
+    res.status(200).json("Saved OnesignalId!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
     })
   }
 }

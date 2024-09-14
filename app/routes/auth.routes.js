@@ -10,6 +10,11 @@ module.exports = app => {
   
   var router = require("express").Router();
 
+  // Admin
+  router.post('/admin_login', users.adminLogin);
+  router.get('/admin_getall', auth, users.adminGetAllUsers);
+  router.get('/admin_getoneuser', auth, users.adminGetOneUsers);
+
   // Retrieve all campaigns
   router.post('/refresh_token/', users.updateAccessToken);
 
@@ -17,6 +22,7 @@ module.exports = app => {
   router.post('/phone_login', users.phoneLogin);
   router.post('/google_login', users.googleLogin);
   router.post('/save_name', auth, users.saveName);
+  router.post('/save_onesignalid', auth, users.saveOnesignalId);
   router.post('/save_age', auth, users.saveAge);
   router.post('/save_firststep', auth, users.saveFirstStep);
   router.post('/save_secondstep', auth, users.saveSecondStep);

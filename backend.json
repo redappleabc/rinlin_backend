@@ -1,0 +1,63 @@
+{
+  "apps": [
+    {
+      "name": "rinlin",
+      "script": "server.js",
+      "cwd": "./",
+      "watch": false,
+      "ignore_watch": ["node_modules", "logs"],
+      "instances": 1,
+      "exec_mode": "fork",
+      "env": {
+        "NODE_ENV": "development",
+        "EMAIL_HOST": "sv14867.xserver.jp",
+        "EMAIL_USER": "info@emille.biz",
+        "EMAIL_PASSWORD": "q9FZ4imez2v9VHAy",
+        "EMAIL_PORT": "587",
+        "FROM_EMAIL": "leel50296@gmail.com",
+        "DB_HOST": "localhost",
+        "DB_USER": "root",
+        "DB_PASSWORD": "Rinlin@1234",
+        "DB_NAME": "matching",
+        "APP_ID": "0c479b78-1774-4233-9f86-193b86e836dd",
+        "API_KEY": "ZGExZDI4MDQtMjgxNi00ODQ0LWJlZWQtMWE1MzE2NzZmNGY2",
+        "BASE_URL": "https://admin.gassho.info",
+        "SK_KEY": "sk_test_51P7C4c00NkCHMLbtlmGTdmuWshIKrPB6bCMG3IWdMB3zSixaFoXzOiV75EZegQQpuSSaAgPU9AcZf1XdxckhajHl00WwfOrfPq",
+        "ADMIN_EMAIL": "admin@gassho.info",
+        "ADMIN_PASSWORD": "t4oLhWRU5Zs9HUk",
+        "ACCESS_SECRET": "jwtAccessSecret",
+        "REFRESH_SECRET": "jwtRefreshSecret",
+        "TWILIO_ACCOUNT_SID": "ACed98427384bb817d137c73e4752f62a5",
+        "TWILIO_AUTH_TOKEN": "e67ce947504f2c539cbd42bc91a092b4",
+        "TWILIO_PHONE_NUMBER": "+12569523246"
+      },
+      "env_production": {
+        "NODE_ENV": "production",
+        "EMAIL_HOST": "sv14867.xserver.jp",
+        "EMAIL_USER": "info@emille.biz",
+        "EMAIL_PASSWORD": "q9FZ4imez2v9VHAy",
+        "EMAIL_PORT": "587",
+        "FROM_EMAIL": "leel50296@gmail.com",
+        "DB_HOST": "localhost",
+        "DB_USER": "root",
+        "DB_PASSWORD": "Rinlin@1234",
+        "DB_NAME": "matching",
+        "APP_ID": "0c479b78-1774-4233-9f86-193b86e836dd",
+        "API_KEY": "ZGExZDI4MDQtMjgxNi00ODQ0LWJlZWQtMWE1MzE2NzZmNGY2",
+        "BASE_URL": "https://admin.gassho.info",
+        "SK_KEY": "sk_test_51P7C4c00NkCHMLbtlmGTdmuWshIKrPB6bCMG3IWdMB3zSixaFoXzOiV75EZegQQpuSSaAgPU9AcZf1XdxckhajHl00WwfOrfPq",
+        "ADMIN_EMAIL": "admin@gassho.info",
+        "ADMIN_PASSWORD": "t4oLhWRU5Zs9HUk",
+        "ACCESS_SECRET": "jwtAccessSecret",
+        "REFRESH_SECRET": "jwtRefreshSecret",
+        "TWILIO_ACCOUNT_SID": "ACed98427384bb817d137c73e4752f62a5",
+        "TWILIO_AUTH_TOKEN": "e67ce947504f2c539cbd42bc91a092b4",
+        "TWILIO_PHONE_NUMBER": "+12569523246"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "error_file": "./logs/backend_error.log",
+      "out_file": "./logs/backend_out.log",
+      "merge_logs": true
+    }
+  ]
+}
