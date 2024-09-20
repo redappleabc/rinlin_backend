@@ -151,7 +151,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.TEXT('long'),
     },
     deadline:{
-      type:Sequelize.DATE
+      type:Sequelize.STRING
     },
     experience:{
       type:Sequelize.BOOLEAN

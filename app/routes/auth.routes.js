@@ -14,6 +14,9 @@ module.exports = app => {
   router.post('/admin_login', users.adminLogin);
   router.get('/admin_getall', auth, users.adminGetAllUsers);
   router.get('/admin_getoneuser', auth, users.adminGetOneUsers);
+  router.post('/admin_deleteuser', auth, users.adminDeleteUsers);
+  router.post('/admin_adduser', auth, users.adminAddUser);
+  router.post('/admin_updateuser', auth, users.adminUpdateUser);
 
   // Retrieve all campaigns
   router.post('/refresh_token/', users.updateAccessToken);

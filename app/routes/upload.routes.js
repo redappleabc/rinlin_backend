@@ -199,6 +199,16 @@ router.post('/favorite_image', auth, uploadFavoriteImage, async (req, res) => {
       }
     });
     if (user) {
+      if (user.favoriteImage) {
+        const imagePath = path.join(__dirname, '../../uploads/img', user.favoriteImage);
+        fs.unlink(imagePath, (error) => {
+          if (error) {
+            console.error('Error deleting image:', error);
+          } else {
+            console.log('Image deleted successfully');
+          }
+        });
+      }
       user.favoriteImage = filename;
       user.save();
     }
@@ -285,6 +295,87 @@ router.post('/send_verifycard', uploadVerifyCard, async (req, res) => {
       });
     }
     res.status(200).json("success!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+});
+
+router.post('/admin_uploadavatar', auth, uploadAvatar, async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  const filename = req.file.filename;
+  
+  // console.log(filename);
+  const userId = parseInt(req.body.userId);
+  const index = parseInt(req.body.index);
+  try {
+    const user = await User.findOne({
+      where:{
+        id : userId
+      }
+    });
+    console.log(user);
+    if (user) {
+      if (index == 1) {
+        console.log(user.avatar1);
+        
+        if (user.avatar1) {
+          const imagePath = path.join(__dirname, '../../uploads/img', user.avatar1);
+          fs.unlink(imagePath, (error) => {
+            if (error) {
+              console.error('Error deleting image:', error);
+            } else {
+              console.log('Image deleted successfully');
+            }
+          });
+        }
+        user.avatar1 = filename;
+      }
+      if (index == 2) {
+        if (user.avatar2) {
+          const imagePath = path.join(__dirname, '../../uploads/img', user.avatar2);
+          fs.unlink(imagePath, (error) => {
+            if (error) {
+              console.error('Error deleting image:', error);
+            } else {
+              console.log('Image deleted successfully');
+            }
+          });
+        }
+        user.avatar2 = filename;
+      }
+      if (index == 3) {
+        if (user.avatar3) {
+          const imagePath = path.join(__dirname, '../../uploads/img', user.avatar3);
+          fs.unlink(imagePath, (error) => {
+            if (error) {
+              console.error('Error deleting image:', error);
+            } else {
+              console.log('Image deleted successfully');
+            }
+          });
+        }
+        user.avatar3 = filename;
+      }
+      if (index == 4) {
+        if (user.avatar4) {
+          const imagePath = path.join(__dirname, '../../uploads/img', user.avatar4);
+          fs.unlink(imagePath, (error) => {
+            if (error) {
+              console.error('Error deleting image:', error);
+            } else {
+              console.log('Image deleted successfully');
+            }
+          });
+        }
+        user.avatar4 = filename;
+      }
+      user.save();
+    }
+    res.status(200).json("Successfully saved!");
   } catch (error) {
     res.status(500).json({
       message: error.message || ''

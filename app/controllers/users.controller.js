@@ -16,6 +16,7 @@ const Block = db.block
 const Matching = db.matching
 const Request = db.request
 const Verify = db.verify
+const Notification = db.notification
 
 // Admin
 exports.adminLogin = async (req, res) => {
@@ -39,7 +40,7 @@ exports.adminLogin = async (req, res) => {
 exports.adminGetAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({
-      order: [['id', 'ASC']]  
+      order: [['id', 'ASC']]
     });
     
     if (users) {
@@ -60,13 +61,193 @@ exports.adminGetOneUsers = async (req, res) => {
     const user = await User.findOne({
       where:{
         id: userId
-      }
+      },
+      include: Group
     });
     if (user) {
       res.status(200).json(user);
     } else {
       res.status(400).json("No User");
     }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.adminAddUser = async (req, res) => {
+  try {
+    console.log(req.body);
+    console.log(JSON.parse(req.body.age));
+    const newuser = await User.create({
+      name: req.body.name,
+      age: JSON.parse(req.body.age),
+      gender: JSON.parse(req.body.gender),
+      verifyed: JSON.parse(req.body.verified),
+      paied: req.body.status!=""?JSON.parse(req.body.status):null,
+      deadline: req.body.deadline,
+      phoneNumber: req.body.phoneNumber,
+      pointCount: JSON.parse(req.body.points),
+      prefectureId: JSON.parse(req.body.prefectureId),
+      height: JSON.parse(req.body.height),
+      bodyType: JSON.parse(req.body.bodyType),
+      attitude: JSON.parse(req.body.attitude),
+      blood: JSON.parse(req.body.blood),
+      birth: JSON.parse(req.body.birth),
+      education: JSON.parse(req.body.education),
+      jobType: JSON.parse(req.body.jobType),
+      income: JSON.parse(req.body.income),
+      materialHistory: JSON.parse(req.body.maritalHistory),
+      children: JSON.parse(req.body.childrenItem),
+      housework: JSON.parse(req.body.houseworkItem),
+      hopemeet: JSON.parse(req.body.hopeMeetItem),
+      datecost: JSON.parse(req.body.dateCostItem),
+      holiday: req.body.holiday!=""?JSON.parse(req.body.holiday):null,
+      roomate: req.body.roomate!=""?JSON.parse(req.body.roomate):null,
+      alcohol: req.body.alcohol!=""?JSON.parse(req.body.alcohol):null,
+      smoking: req.body.smoking!=""?JSON.parse(req.body.smoking):null,
+      saving: req.body.saving!=""?JSON.parse(req.body.saving):null,
+      introduce: req.body.introduce,
+      question1: req.body.question1!=""?req.body.question1:null,
+      question2: req.body.question2!=""?req.body.question2:null,
+      question3: req.body.question3!=""?req.body.question3:null,
+      favoriteDescription: req.body.favoriteDescription!=""?req.body.favoriteDescription:null,
+      phrase1: "こんにちは！\n共通する趣味や性格に惹かれて、メッセージを送ってみました。\n私はADREESに在住するAGE歳のNAMEです。\nメッセージお待ちしております。",
+      phrase2: "初めまして。\n私は$uniqueADREESに在住する$uniqueAGE歳の$uniqueNAMEです。\nお互いまずはゆっくりとメッセージを重ねて仲良くなりたいです。\nよろしくお願いいたします。",
+      phrase3: "初めまして。$NAMEと申します。\nプロフィールを拝見して、ぜひ一度メッセージをしたいと思いご連絡いたしました。\nよろしくお願いいたします。",
+      experience: true,
+      viewUsers:0
+    });
+    
+    if (newuser) {
+      const userId = newuser.id;
+      const user = await User.findOne({
+        where:{
+          id: userId
+        },
+        include:Group
+      });
+      if (user) {
+        const len = req.body.selectedGroups.length;
+        const groupArray = [];
+        for (let i = 0; i < len; i++) {
+          groupArray[i] = await Group.findOne({
+            where: {
+              id: JSON.parse(req.body.selectedGroups[i])
+            }
+          });
+          console.log(groupArray[i]);
+          await user.addGroup(groupArray[i], {through: { selfGranted: false }});
+          groupArray[i].members = groupArray[i].members + 1;
+          groupArray[i].save()
+        }
+      }
+    }
+    res.status(200).json(newuser.id); 
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.adminUpdateUser = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const user = await User.findOne({
+      where:{
+        id: userId
+      },
+      include:Group
+    });
+    if (user) {
+      user.name = req.body.name;
+      user.age = JSON.parse(req.body.age);
+      user.gender = JSON.parse(req.body.gender);
+      user.verifyed = JSON.parse(req.body.verified);
+      user.paied = req.body.status!=""?JSON.parse(req.body.status):null;
+      user.deadline = req.body.deadline;
+      user.phoneNumber = req.body.phoneNumber;
+      user.pointCount = JSON.parse(req.body.points);
+      user.prefectureId = JSON.parse(req.body.prefectureId);
+      user.height = JSON.parse(req.body.height);
+      user.bodyType = JSON.parse(req.body.bodyType);
+      user.attitude = JSON.parse(req.body.attitude);
+      user.blood = JSON.parse(req.body.blood);
+      user.birth = JSON.parse(req.body.birth);
+      user.education = JSON.parse(req.body.education);
+      user.jobType = JSON.parse(req.body.jobType);
+      user.income = JSON.parse(req.body.income);
+      user.materialHistory = JSON.parse(req.body.maritalHistory);
+      user.children = JSON.parse(req.body.childrenItem);
+      user.housework = JSON.parse(req.body.houseworkItem);
+      user.hopemeet = JSON.parse(req.body.hopeMeetItem);
+      user.datecost = JSON.parse(req.body.dateCostItem);
+      user.holiday = req.body.holiday!=""?JSON.parse(req.body.holiday):null;
+      user.roomate = req.body.roomate!=""?JSON.parse(req.body.roomate):null;
+      user.alcohol = req.body.alcohol!=""?JSON.parse(req.body.alcohol):null;
+      user.smoking = req.body.smoking!=""?JSON.parse(req.body.smoking):null;
+      user.saving = req.body.saving!=""?JSON.parse(req.body.saving):null;
+      user.introduce = req.body.introduce;
+      user.question1 = req.body.question1!=""?req.body.question1:null;
+      user.question2 = req.body.question2!=""?req.body.question2:null;
+      user.question3 = req.body.question3!=""?req.body.question3:null;
+      user.favoriteDescription = req.body.favoriteDescription!=""?req.body.favoriteDescription:null;
+      user.save();
+      for (let i = 0; i < user.groups.length; i++) {
+        const group = await Group.findOne({
+          where:{
+            id: user.groups[i].id
+          }
+        });
+        group.members = group.members - 1;
+        group.save();
+        await user.removeGroup(([group.id]));
+      }
+      const len = req.body.selectedGroups.length;
+      const groupArray = [];
+      for (let i = 0; i < len; i++) {
+        console.log(JSON.parse(req.body.selectedGroups[i]));
+        groupArray[i] = await Group.findOne({
+          where: {
+            id: JSON.parse(req.body.selectedGroups[i])
+          }
+        });
+        console.log("groupArray[i]", groupArray[i]);
+        await user.addGroup(groupArray[i], {through: { selfGranted: false }});
+        groupArray[i].members = groupArray[i].members + 1;
+        groupArray[i].save();
+      }
+      res.status(200).json(user.id); 
+    } else {
+      res.status(400).json("No User!");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.adminDeleteUsers = async (req, res) => {
+  try {
+    const userId= req.body.userId;
+    console.log(userId);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      },
+      include:[Group, Notification]
+    });
+
+    if (user) {
+      user.removeGroups();
+      user.destroy();  
+    } else {
+      res.status(400).json("No User!");
+    }
+    res.status(200).json("Deleted!");
   } catch (error) {
     res.status(500).json({
       message: error.message || ''
@@ -1568,10 +1749,13 @@ exports.deleteAccount = async (req, res) => {
     const userId= parseInt(req.body.userId);
     const user = await User.findOne({
       where:{
-        userId: userId
-      }
+        id: userId
+      },
+      include:[Group]
     });
+
     if (user) {
+      user.removeGroups();
       user.destroy();  
     } else {
       res.status(400).json("No User!");

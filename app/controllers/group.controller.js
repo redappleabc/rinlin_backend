@@ -108,7 +108,7 @@ exports.removeGroups = async (req, res) => {
       for (let i = 0; i < removeGroups.length; i++) {
         for (let j = 0; j < user.groups.length; j++) {
           if (user.groups[j].id == removeGroups[i]) {
-            user.groups[j].destroy()
+            await user.removeGroup(([removeGroups[i]]));
             const group = await Group.findOne({
               where:{
                 id: removeGroups[i]

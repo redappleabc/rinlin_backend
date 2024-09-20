@@ -80,6 +80,7 @@ require("./app/routes/records.routes")(app);
 require("./app/routes/like.routes")(app);
 require("./app/routes/block.routes")(app);
 require("./app/routes/post.routes")(app);
+require("./app/routes/matching.routes")(app);
 require("./app/routes/notification.routes")(app);
 app.use("/api/upload", require('./app/routes/upload.routes'));
 
