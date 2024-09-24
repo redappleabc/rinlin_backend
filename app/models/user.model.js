@@ -9,7 +9,7 @@ module.exports = (sequelize, Sequelize) => {
     lineId: {
       type: Sequelize.STRING,
     },
-    linePassword: {
+    lineDisplayName: {
       type: Sequelize.STRING,
     },
     facebookId: {
