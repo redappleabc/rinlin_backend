@@ -156,6 +156,9 @@ module.exports = (sequelize, Sequelize) => {
     experience:{
       type:Sequelize.BOOLEAN
     },
+    is_registered:{
+      type: Sequelize.BOOLEAN
+    }
   }
 );
 

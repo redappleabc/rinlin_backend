@@ -1797,6 +1797,50 @@ exports.clearViewUsers = async (req, res) => {
   }
 }
 
+exports.setIsRegistered = async (req, res) => {
+  try {
+    const userId= parseInt(req.body.userId);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      user.is_registered = true;
+      user.save();
+    }
+    res.status(200).json("success!");
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+exports.getIsRegistered = async (req, res) => {
+  try {
+    const userId= req.query.userId;
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if(user.is_registered == true) {
+        res.status(200).json("Registered User!");    
+      } else {
+        res.status(400).json("Unregistered User!");    
+      }
+    } else {
+      res.status(400).json("No User!");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
 exports.deleteAccount = async (req, res) => {
   try {
     const userId= parseInt(req.body.userId);

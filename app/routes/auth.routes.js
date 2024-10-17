@@ -57,6 +57,7 @@ module.exports = app => {
   router.post('/advice_request', auth, users.adviceRequest);
   router.post('/checked_verifystate', auth, users.checkedVerifystate);
   router.post('/clear_viewusers', auth, users.clearViewUsers);
+  router.post('/set_isregistered', auth, users.setIsRegistered);
   router.delete('/delete_account', auth, users.deleteAccount);
   
   router.get('/getuser', auth, users.getUser);
@@ -65,6 +66,7 @@ module.exports = app => {
   router.get('/get_phrase', auth, users.getPhrase);
   router.get('/get_advicestate', auth, users.getAdviceState);
   router.get('/get_verifystate', auth, users.getVerifyState);
+  router.get('/get_isregistered', auth, users.getIsRegistered);
 
   router.get('/get_allusers', auth, users.getAllUsers);
 
