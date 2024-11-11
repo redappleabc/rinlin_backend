@@ -340,7 +340,7 @@ exports.phoneRegister = async (req, res) => {
       const accountSid = process.env.TWILIO_ACCOUNT_SID;
       const authToken = process.env.TWILIO_AUTH_TOKEN;
       const client = new twilio(accountSid, authToken);
-      const phoneNumber = `+${req.body.phone_number}`;
+      const phoneNumber = `+81${(req.body.phone_number).slice(1, req.body.phone_number.length-1)}`;
       client.messages.create({
         body: `Your verification code is: ${randomString}`,
         to: phoneNumber,
