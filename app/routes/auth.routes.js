@@ -60,6 +60,7 @@ module.exports = app => {
   router.post('/clear_viewusers', auth, users.clearViewUsers);
   router.post('/set_isregistered', auth, users.setIsRegistered);
   router.delete('/delete_account', auth, users.deleteAccount);
+  router.post('/save_subscription', auth, users.saveSubscription);
   
   router.get('/getuser', auth, users.getUser);
   router.get('/getuserById', auth, users.getUserById);

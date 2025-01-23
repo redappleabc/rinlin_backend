@@ -693,6 +693,15 @@ exports.getUser = async (req, res) => {
       include: Group
     });
     if (user) {
+      if (user.deadline) {
+        const dealineDate = new Date(user.deadline);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        if (currentDate > dealineDate) {
+          user.paied = false;
+          user.save();
+        }
+      }
       let avatars = [];
       if (user.avatar1 != null) {
         avatars.push(user.avatar1)
@@ -1915,3 +1924,88 @@ exports.deleteAccount = async (req, res) => {
     })
   }
 }
+
+exports.saveSubscription = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const type = req.body.type;
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      const currentDate = new Date();
+      const formattedCurrentDate = getFormattedDate(currentDate);
+      switch (type) {
+        case "$rc_three_month":
+          if (user.deadline) {
+            const nextMonthDate = new Date(user.deadline);
+            const formattedNextMonthDate = getFormattedDate(new Date(nextMonthDate.setMonth(nextMonthDate.getMonth() + 3)));
+            user.deadline = formattedNextMonthDate;
+          } else {
+            const nextMonthDate = new Date(formattedCurrentDate);
+            const formattedNextMonthDate = getFormattedDate(new Date(nextMonthDate.setMonth(nextMonthDate.getMonth() + 3)));
+            user.deadline = formattedNextMonthDate;
+          }
+          user.paied = true;
+          user.save();
+          break;
+        case "$rc_six_month":
+          if (user.deadline) {
+            const nextMonthDate = new Date(user.deadline);
+            const formattedNextMonthDate = getFormattedDate(new Date(nextMonthDate.setMonth(nextMonthDate.getMonth() + 6)));
+            user.deadline = formattedNextMonthDate;
+          } else {
+            const nextMonthDate = new Date(formattedCurrentDate);
+            const formattedNextMonthDate = getFormattedDate(new Date(nextMonthDate.setMonth(nextMonthDate.getMonth() + 6)));
+            user.deadline = formattedNextMonthDate;
+          }
+          user.paied = true;
+          user.save();
+          break;
+        case "$rc_annual":
+          if (user.deadline) {
+            const nextYearDate = new Date(user.deadline);
+            const formattedNextYearDate = getFormattedDate(new Date(nextYearDate.setFullYear(nextYearDate.getFullYear() + 1)));
+            user.deadline = formattedNextYearDate;
+          } else {
+            const nextYearDate = new Date(formattedCurrentDate);
+            const formattedNextYearDate = getFormattedDate(new Date(nextYearDate.setFullYear(nextYearDate.getFullYear() + 1)));
+            user.deadline = formattedNextYearDate;
+          }
+          user.paied = true;
+          user.save();
+          break;       
+        default:
+          if (user.deadline) {
+            const nextMonthDate = new Date(user.deadline);
+            const formattedNextMonthDate = getFormattedDate(new Date(nextMonthDate.setMonth(nextMonthDate.getMonth() + 1)));
+            user.deadline = formattedNextMonthDate;
+          } else {
+            const nextMonthDate = new Date(formattedCurrentDate);
+            const formattedNextMonthDate = getFormattedDate(new Date(nextMonthDate.setMonth(nextMonthDate.getMonth() + 1)));
+            user.deadline = formattedNextMonthDate;
+          }
+          user.paied = true;
+          user.save();
+          break;
+      }
+      res.status(200).json("Success!");
+    } else {
+      res.status(400).json("No User!");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}
+
+const getFormattedDate = (date) => {
+  console.log("date", date);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
