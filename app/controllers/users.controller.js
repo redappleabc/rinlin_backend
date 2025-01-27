@@ -2009,3 +2009,31 @@ const getFormattedDate = (date) => {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
+
+exports.savePoints = async (req, res) => {
+  try {
+    const userId = parseInt(req.body.id);
+    const points = parseInt(req.body.points);
+    const user = await User.findOne({
+      where:{
+        id: userId
+      }
+    });
+    if (user) {
+      if (user.pointCount) {
+        user.pointCount = user.pointCount + points;
+      } else {
+        user.pointCount = points;
+      }
+      user.save();
+      res.status(200).json("Success!");
+    } else {
+      res.status(400).json("No User!");
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || ''
+    })
+  }
+}

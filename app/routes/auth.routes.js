@@ -61,6 +61,7 @@ module.exports = app => {
   router.post('/set_isregistered', auth, users.setIsRegistered);
   router.delete('/delete_account', auth, users.deleteAccount);
   router.post('/save_subscription', auth, users.saveSubscription);
+  router.post('/save_buypointsresult', auth, users.savePoints);
   
   router.get('/getuser', auth, users.getUser);
   router.get('/getuserById', auth, users.getUserById);
