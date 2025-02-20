@@ -1347,7 +1347,11 @@ exports.getAllUsers = async (req, res) => {
         id: userId
       }
     });
-    const users = await User.findAll({});
+    const users = await User.findAll({
+      where:{
+        is_registered: true
+      }
+    });
     const likes = await Like.findAll({
       where:{
         userId: userId
